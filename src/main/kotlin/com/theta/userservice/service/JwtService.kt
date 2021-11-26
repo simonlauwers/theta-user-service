@@ -42,4 +42,16 @@ class JwtService {
                 .signWith(secretKey)
                 .compact()
     }
+
+    fun getJwtClaims(authorizationHeader: String): Jws<Claims> {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(getJwtFromHeader(authorizationHeader))
+    }
+
+    private fun getJwtFromHeader(authorizationHeader: String): String {
+        val jwt = authorizationHeader.split("Bearer ")
+        return if (jwt.size == 2)
+            jwt[1]
+        else
+            throw MalformedJwtException("Header is not a valid jwt!")
+    }
 }

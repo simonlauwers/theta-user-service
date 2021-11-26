@@ -1,5 +1,6 @@
 package com.theta.userservice.api
 
+import com.theta.userservice.dto.LoginDTO
 import com.theta.userservice.dto.RegisterDTO
 import com.theta.userservice.service.JwtService
 import org.springframework.http.HttpStatus
@@ -11,7 +12,7 @@ import javax.validation.Valid
 
 
 @RestController
-@RequestMapping("api")
+@RequestMapping("/api")
 class UserController(val userService: UserService, val jwtService: JwtService) {
     @PostMapping("/register")
     fun register(@Valid @RequestBody body: RegisterDTO): ResponseEntity<Any> {
@@ -20,7 +21,6 @@ class UserController(val userService: UserService, val jwtService: JwtService) {
         user.email = body.email;
         user.password = body.password;
 
-        val existingUser = userService.findByEmail(user.email)
         return if (userService.findByEmail(user.email).isPresent)
             ResponseEntity("User already exists", HttpStatus.CONFLICT)
         else {
@@ -31,11 +31,14 @@ class UserController(val userService: UserService, val jwtService: JwtService) {
     }
 
     @PostMapping("/login")
-    fun login(@Valid @RequestBody user: User): ResponseEntity<Any> {
-        return if (userService.findByEmailAndPassword(user.email, user.password).isPresent)
+    fun login(@Valid @RequestBody body: LoginDTO): ResponseEntity<Any> {
+        val user = User()
+        user.password = body.password
+        user.email = body.email
+        return if (userService.findByEmailAndPassword(body.email, body.password).isPresent)
             ResponseEntity.ok(jwtService.create(user))
         else
-            ResponseEntity(HttpStatus.UNAUTHORIZED)
+            ResponseEntity(HttpStatus.BAD_GATEWAY)
     }
 
     @GetMapping("/test")

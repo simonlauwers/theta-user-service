@@ -17,6 +17,7 @@ class User {
     var email = ""
 
     @Column
+    @get:NotBlank(message = "Password should not be blank!")
     var password = ""
         get() = field
         set(value) {

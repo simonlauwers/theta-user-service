@@ -36,7 +36,6 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.10.2")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.10.2")
 	implementation("org.springframework.boot:spring-boot-starter-security:2.2.0.RELEASE")
-
 }
 
 tasks.withType<KotlinCompile> {
