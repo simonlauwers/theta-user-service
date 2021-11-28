@@ -3,12 +3,11 @@ package com.theta.userservice.api
 import Sl4jLogger
 import Sl4jLogger.Companion.log
 import com.theta.userservice.dto.LoginDTO
-import com.theta.userservice.dto.Message
+import com.theta.userservice.dto.MessageDTO
 import com.theta.userservice.dto.RegisterDTO
 import com.theta.userservice.model.User
 import com.theta.userservice.service.JwtService
 import com.theta.userservice.service.UserService
-import org.apache.coyote.Response
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -41,33 +40,37 @@ class UserController(val userService: UserService, val jwtService: JwtService) {
     @PostMapping("/login")
     fun login(@Valid @RequestBody body: LoginDTO, response: HttpServletResponse): ResponseEntity<Any> {
         val user = userService.findByEmail(body.email)
-                ?: return ResponseEntity.badRequest().body(Message("User not found!"));
+                ?: return ResponseEntity.badRequest().body(MessageDTO("User not found!"));
         val responseHeaders = HttpHeaders()
         if (!BCryptPasswordEncoder().matches(body.password, user.password))
-            return ResponseEntity.badRequest().body(Message("Invalid password!"))
-        else
-            responseHeaders.set("Authorization", jwtService.create(user))
-            return ResponseEntity.ok().headers(responseHeaders).body(Message("Success! Jwt is available in Authorization-header"));
+            return ResponseEntity.badRequest().body(MessageDTO("Invalid password!"))
+        else {
+            val jwt = jwtService.create(user);
+            val cookie = Cookie ("jwt", jwt);
+            cookie.isHttpOnly = true;
+            response.addCookie(cookie)
+            return ResponseEntity.ok(MessageDTO("Success! Jwt cookie created!"))
+        }
     }
 
     @GetMapping("/test")
-    fun test(@RequestHeader("Authorization") jwt: String?): ResponseEntity<Any> {
+    fun test(@CookieValue("jwt") jwt: String?): ResponseEntity<Any> {
         try {
             if (jwt == null) {
-                return ResponseEntity.status(401).body(Message("unauthenticated"))
+                return ResponseEntity.status(401).body(MessageDTO("unauthenticated"))
             }
             val body = jwtService.getJwtClaims(jwt).body;
             log.info(body.issuer);
 
             val user = userService.findById(UUID.fromString(body.issuer));
 
-            if(user.isPresent){
-                return ResponseEntity.ok(user);
-            }else{
-                return ResponseEntity.badRequest().body(Message("Couldnt find a user bound to that token"));
+            return if (user.isPresent) {
+                ResponseEntity.ok(user);
+            } else {
+                ResponseEntity.badRequest().body(MessageDTO("Couldn't find a user from that token"));
             }
         } catch (e: Exception) {
-            return ResponseEntity.status(401).body(Message("unauthenticated"))
+            return ResponseEntity.status(401).body(MessageDTO("unauthenticated"))
         }
     }
 
