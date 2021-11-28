@@ -27,7 +27,7 @@ gradle-build:
     - tags
   stage: build
   script:
-    - gradle properties -q | grep "version:" | awk '{print $2}' | tr -d '\n' > version.txt
+    - cat build.gradle.kts | grep "version =" | awk '{print $3}' | tr -d '"' > version.txt
     - gradle --build-cache assemble
     - echo "$(ls build/libs)"
     - mv "build/libs/user-service-$(cat version.txt).jar" app.jar
