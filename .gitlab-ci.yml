@@ -18,6 +18,8 @@ stages:
 
 test:
   stage: test
+  except:
+    - tags
   script:
     - echo TODO
 
