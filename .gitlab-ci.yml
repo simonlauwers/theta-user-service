@@ -27,8 +27,9 @@ gradle-build:
     - tags
   stage: build
   script:
-    - gradle properties -q | grep "version:" | awk '{print $2}' | tr -d '1.6.0' | tr -d '\n' > version.txt
+    - gradle properties -q | grep "version:" | awk '{print $2}' | tr -d '\n' > version.txt
     - gradle --build-cache assemble
+    - echo "$(ls build/libs)"
     - mv "build/libs/user-service-$(cat version.txt).jar" app.jar
   artifacts:
     paths:
