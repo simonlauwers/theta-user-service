@@ -9,21 +9,18 @@ import java.util.*
 @Service
 class UserService(val userRepository: UserRepository) {
     fun create(user: User): User {
-        return userRepository.save(user)
+        return userRepository.save(user);
     }
 
-    fun findByEmail(email: String): Optional<User> {
-        return userRepository.findByEmail(email)
+    fun findByEmail(email: String): User? {
+        return userRepository.findByEmail(email);
     }
 
-    fun findByEmailAndPassword(email: String, pw: String): Optional<User> {
-        return if (pw.isEmpty())
-            Optional.empty()
-        else
-            userRepository.findByEmailAndPassword(email, encryptPassword(pw))
+    fun findById(id: UUID) : Optional<User> {
+        return userRepository.findById(id);
     }
 
-    fun encryptPassword(pw: String): String {
-        return BCryptPasswordEncoder().encode(pw);
-    }
+
+
+
 }

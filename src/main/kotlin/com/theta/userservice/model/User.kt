@@ -1,5 +1,6 @@
 package com.theta.userservice.model
 
+import org.hibernate.annotations.Type
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import java.util.*
 import javax.persistence.*
@@ -10,8 +11,10 @@ import javax.validation.constraints.Email
 @Entity
 class User {
     @Id
-    @GeneratedValue
-    val id: UUID = UUID.randomUUID()
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Type(type="uuid-char")
+    @Column(name = "ID", columnDefinition = "VARCHAR(36)")
+    val uuid: UUID = UUID.randomUUID()
 
     @Column(unique = true)
     var email = ""
@@ -19,12 +22,6 @@ class User {
     @Column
     @get:NotBlank(message = "Password should not be blank!")
     var password = ""
-        get() = field
-        set(value) {
-            val passwordEncoder = BCryptPasswordEncoder()
-            field = passwordEncoder.encode(value)
-        }
-
 
     @Column(unique = true)
     var displayName = ""

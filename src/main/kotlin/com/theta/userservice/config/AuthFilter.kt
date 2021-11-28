@@ -16,19 +16,17 @@ class AuthFilter(val jwtService: JwtService) : HandlerInterceptor {
     var log = LoggerFactory.getLogger(this.javaClass)!!
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-
-        return true
-        return try {
+        try {
             val authorizationHeader = request.getHeader("Authorization")
                     ?: throw JwtException("Authorization header should not be null")
 
             // throws exceptions if the jwt is not valid
             jwtService.getJwtClaims(authorizationHeader)
-            true
+            return true
         } catch (e: JwtException) {
             log.warn(e.message)
             response.status = HttpStatus.BAD_REQUEST.value()
-            false
+            return false
         }
     }
 

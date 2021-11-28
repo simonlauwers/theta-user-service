@@ -13,7 +13,7 @@ class WebConfig(val authFilter: AuthFilter) : WebMvcConfigurer {
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(authFilter)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/resources/**", "/error", "/login", "/sign-up")
+                .excludePathPatterns("/api/register", "/api/login")
     }
 
 }
