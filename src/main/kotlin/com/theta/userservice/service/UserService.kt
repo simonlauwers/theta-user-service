@@ -19,8 +19,4 @@ class UserService(val userRepository: UserRepository) {
     fun findById(id: UUID) : Optional<User> {
         return userRepository.findById(id);
     }
-
-
-
-
 }

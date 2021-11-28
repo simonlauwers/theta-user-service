@@ -17,11 +17,11 @@ class AuthFilter(val jwtService: JwtService) : HandlerInterceptor {
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         try {
-            val authorizationHeader = request.getHeader("Authorization")
-                    ?: throw JwtException("Authorization header should not be null")
+            val jwtCookie = request.cookies[0].value
+                    ?: throw JwtException("Authorization cookie should not be null")
 
             // throws exceptions if the jwt is not valid
-            jwtService.getJwtClaims(authorizationHeader)
+            jwtService.getJwtClaims(jwtCookie)
             return true
         } catch (e: JwtException) {
             log.warn(e.message)
