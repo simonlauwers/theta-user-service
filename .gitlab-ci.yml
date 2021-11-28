@@ -1,0 +1,100 @@
+image: docker:latest
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay
+  SPRING_PROFILES_ACTIVE: gitlab-ci
+  CONTAINER_NAME: eu.gcr.io/ip2-test/user-service
+
+stages:
+  - test
+  - build
+  - package
+  - push
+  - tag-release
+  - deploy-staging
+  - deploy-production
+
+test:
+  stage: test
+  script:
+    - echo TODO
+
+gradle-build:
+  image: gradle:alpine
+  stage: build
+  script:
+    - gradle properties -q | grep "version:" | awk '{print $2}' > version.txt
+    - gradle --build-cache assemble
+    - mv "build/libs/user-service-$(cat version.txt).jar" app.jar
+  artifacts:
+    paths:
+      - app.jar
+      - version.txt
+    expire_in: 1 week
+
+docker-build:
+  stage: package
+  script:
+    - CONTAINER="$(echo $CONTAINER_NAME):$(cat version.txt)"
+    - echo $CONTAINER
+    - docker build -t $(echo $CONTAINER) --build-arg JAR_FILE=app.jar .
+    - docker save -o image.tar $(echo $CONTAINER)
+  artifacts:
+    paths:
+      - image.tar
+    expire_in: 1 week
+
+docker-push:
+  stage: push
+  before_script:
+    - base64 -d $GCP_SA_KEY | docker login -u _json_key --password-stdin https://eu.gcr.io
+  script:
+    - CONTAINER="$(echo $CONTAINER_NAME):$(cat version.txt)"
+    - docker load -i image.tar
+    - docker push $(echo $CONTAINER)
+
+tag-release:
+  stage: tag-release
+  except:
+  - tags
+  image: ubuntu
+  before_script:
+    - apt-get -y update
+    - apt-get -y install git
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+  script:
+    - | 
+      git tag "$(cat version.txt)"
+      git push --tags http://verhelstquinten:$PAT_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:main
+
+
+gcloud-deploy-staging:
+  stage: deploy-staging
+  image: google/cloud-sdk
+  only:
+    - staging
+  script:
+    - CONTAINER="$(echo $CONTAINER_NAME):$(cat version.txt)"
+    - base64 -d $GCP_SA_KEY > ~/encoded_serviceaccount.json
+    - gcloud auth activate-service-account --key-file ~/encoded_serviceaccount.json
+    - gcloud config set project ip2-test
+    - chmod +x ./update-deployment.sh
+    - echo $CONTAINER
+    - ./update-deployment.sh $CONTAINER staging
+
+gcloud-deploy-production:
+  stage: deploy-production
+  image: google/cloud-sdk
+  only:
+    - main
+  script:
+    - CONTAINER="$(echo $CONTAINER_NAME):$(cat version.txt)"
+    - base64 -d $GCP_SA_KEY > ~/encoded_serviceaccount.json
+    - gcloud auth activate-service-account --key-file ~/encoded_serviceaccount.json
+    - gcloud config set project ip2-test
+    - chmod +x ./update-deployment.sh
+    - echo $CONTAINER
+    - ./update-deployment.sh $CONTAINER production
