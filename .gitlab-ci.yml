@@ -23,6 +23,8 @@ test:
 
 gradle-build:
   image: gradle:alpine
+  except:
+    - tags
   stage: build
   script:
     - gradle properties -q | grep "version:" | awk '{print $2}' > version.txt
@@ -36,6 +38,8 @@ gradle-build:
 
 docker-build:
   stage: package
+  except:
+    - tags
   script:
     - CONTAINER="$(echo $CONTAINER_NAME):$(cat version.txt)"
     - echo $CONTAINER
@@ -48,6 +52,8 @@ docker-build:
 
 docker-push:
   stage: push
+  except:
+    - tags
   before_script:
     - base64 -d $GCP_SA_KEY | docker login -u _json_key --password-stdin https://eu.gcr.io
   script:
@@ -74,6 +80,8 @@ tag-release:
 gcloud-deploy-staging:
   stage: deploy-staging
   image: google/cloud-sdk
+  except:
+    - tags
   only:
     - staging
   script:
@@ -88,6 +96,8 @@ gcloud-deploy-staging:
 gcloud-deploy-production:
   stage: deploy-production
   image: google/cloud-sdk
+  except:
+    - tags
   only:
     - main
   script:
