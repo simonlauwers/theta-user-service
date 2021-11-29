@@ -1,14 +1,15 @@
 package com.theta.userservice.model
 
+import lombok.Getter
+import lombok.Setter
 import org.hibernate.annotations.Type
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.NotBlank
-import javax.validation.constraints.Email
-
 
 @Entity
+@Getter
+@Setter
 class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,6 +25,8 @@ class User {
     var password = ""
 
     @Column(unique = true)
+    @get:NotBlank(message = "Displayname should not be blank!!")
     var displayName = ""
 
+    var profilePicture = "https://commons.wikimedia.org/wiki/File:Default_pfp.jpg"
 }
