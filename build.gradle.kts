@@ -5,6 +5,8 @@ plugins {
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 	kotlin("jvm") version "1.6.0"
 	kotlin("plugin.spring") version "1.6.0"
+	kotlin("plugin.lombok") version "1.6.0"
+
 }
 
 group = "com.theta"
@@ -36,7 +38,19 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.10.2")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.10.2")
 	implementation("org.springframework.boot:spring-boot-starter-security:2.2.0.RELEASE")
-	implementation("org.springframework.boot:spring-boot-starter-mail:1.2.0.RELEASE")
+	compileOnly("org.projectlombok:lombok:1.18.22")
+	annotationProcessor("org.projectlombok:lombok:1.18.22")
+
+	testCompileOnly("org.projectlombok:lombok:1.18.22")
+	testAnnotationProcessor("org.projectlombok:lombok:1.18.22")
+	// testing
+	testImplementation("io.cucumber:cucumber-junit:4.2.0")
+	implementation("io.cucumber:cucumber-java8:4.2.0")
+	testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+	implementation("io.cucumber:cucumber-spring:4.2.0")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("io.rest-assured:rest-assured:3.0.0")
+
 
 }
 
