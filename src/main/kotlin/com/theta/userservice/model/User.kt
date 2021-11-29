@@ -6,6 +6,7 @@ import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.Pattern
 
 @Entity
 @Getter
@@ -26,6 +27,7 @@ class User {
 
     @Column(unique = true)
     @get:NotBlank(message = "Displayname should not be blank!!")
+    @Pattern(regexp = "/^(?=.[a-z])(?=.[A-Z])(?=.{8,})/")
     var displayName = ""
 
     var profilePicture = "https://commons.wikimedia.org/wiki/File:Default_pfp.jpg"
