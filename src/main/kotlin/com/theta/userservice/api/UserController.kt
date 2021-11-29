@@ -6,16 +6,19 @@ import com.theta.userservice.dto.EditProfileDTO
 import com.theta.userservice.dto.LoginDTO
 import com.theta.userservice.dto.MessageDTO
 import com.theta.userservice.dto.RegisterDTO
+import com.theta.userservice.model.ConfirmationToken
 import com.theta.userservice.model.User
+import com.theta.userservice.service.EmailService
 import com.theta.userservice.service.JwtService
 import com.theta.userservice.service.UserService
+import org.apache.coyote.Response
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.mail.SimpleMailMessage
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.bind.annotation.*
-import java.sql.SQLIntegrityConstraintViolationException
 import java.util.*
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
@@ -25,25 +28,55 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/api")
 @Sl4jLogger
-class UserController(val userService: UserService, val jwtService: JwtService) {
+class UserController(val userService: UserService, val jwtService: JwtService, val emailService: EmailService) {
     @PostMapping("/register")
-    fun register(@Valid @RequestBody body: RegisterDTO): ResponseEntity<Any> {
-        val user = User()
-        user.displayName = body.displayName
-        user.email = body.email
-        user.password = BCryptPasswordEncoder().encode(body.password)
+    fun register(@RequestBody body: RegisterDTO): ResponseEntity<Any> {
+        try {
+            val user = User()
+            user.displayName = body.displayName
+            user.email = body.email
+            user.password = BCryptPasswordEncoder().encode(body.password)
 
-        return if (userService.findByEmail(user.email) != null)
-            ResponseEntity("User already exists", HttpStatus.CONFLICT)
-        else {
-            ResponseEntity.ok(userService.create(user))
+            return if (userService.findByEmail(user.email) != null)
+                ResponseEntity("User already exists", HttpStatus.CONFLICT)
+            else {
+                val newUser = userService.save(user)
+                val confirmationToken = ConfirmationToken(newUser)
+                emailService.addConfirmationToken(confirmationToken)
+                val mailMessage = SimpleMailMessage()
+                mailMessage.setTo(newUser.email)
+                mailMessage.setSubject("Confirm your email address!")
+                mailMessage.setFrom("no-reply@theta-risk.com")
+                mailMessage.setText("Hello " +  newUser.displayName + ", click this link to confirm your account:  https://bit.ly/3E3OUSA (you can ignore this tokenId " + confirmationToken.confirmationToken + ")")
+
+                emailService.sendEmail(mailMessage)
+
+                return ResponseEntity.ok(newUser)
+            }
+        }catch (e: Exception){
+            return ResponseEntity.badRequest().body(MessageDTO("Duplicate displayname"))
         }
     }
 
+    @PostMapping("/confirm-account")
+    fun confirmAccount(@RequestBody token: String) : ResponseEntity<Any>{
+        val confirmationToken = emailService.findByConfirmationToken(token);
+
+        if(confirmationToken != null){
+           val userToUpdate = userService.findById(confirmationToken.userEntity!!.userId)
+            userToUpdate.get().isEnabled = true;
+            val updatedUser = userService.save(userToUpdate.get())
+            return ResponseEntity.ok(updatedUser)
+        }
+        return ResponseEntity.badRequest().body(MessageDTO("Not matching confirmationtoken found in database!"))
+    }
+
     @PostMapping("/login")
-    fun login(@Valid @RequestBody body: LoginDTO, response: HttpServletResponse): ResponseEntity<Any> {
+    fun login(@RequestBody body: LoginDTO, response: HttpServletResponse): ResponseEntity<Any> {
         val user = userService.findByEmail(body.email)
                 ?: return ResponseEntity.badRequest().body(MessageDTO("User not found!"))
+        if(!user.isEnabled)
+            return ResponseEntity.badRequest().body(MessageDTO("User is not yet confirmed! Check your email: + " + user.email))
         val responseHeaders = HttpHeaders()
         if (!BCryptPasswordEncoder().matches(body.password, user.password))
             return ResponseEntity.badRequest().body(MessageDTO("Invalid password!"))
@@ -77,7 +110,7 @@ class UserController(val userService: UserService, val jwtService: JwtService) {
         }
     }
 
-    @PostMapping("/editprofile")
+    @PostMapping("/edit-profile")
     fun editProfile(@CookieValue("jwt") jwt: String?, @Valid @RequestBody editProfileDto: EditProfileDTO): ResponseEntity<Any> {
         try {
             if (jwt == null) {

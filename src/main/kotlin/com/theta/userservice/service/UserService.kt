@@ -9,7 +9,7 @@ import java.util.*
 
 @Service
 class UserService(val userRepository: UserRepository) {
-    fun create(user: User): User {
+    fun save(user: User): User {
         return userRepository.save(user)
     }
 
