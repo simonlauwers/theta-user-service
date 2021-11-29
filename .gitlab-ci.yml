@@ -25,6 +25,8 @@ test:
 
 gradle-build:
   image: gradle:alpine
+  only:
+    - main
   except:
     - tags
   stage: build
