@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.theta"
-version = "0.4.0"
+version = "0.4.2"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {
