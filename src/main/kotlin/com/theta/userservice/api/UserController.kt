@@ -7,7 +7,6 @@ import com.theta.userservice.model.ConfirmationToken
 import com.theta.userservice.model.ResetPasswordToken
 import com.theta.userservice.model.User
 import com.theta.userservice.service.*
-import org.apache.coyote.Response
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -16,6 +15,7 @@ import org.springframework.mail.SimpleMailMessage
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.util.*
+import javax.mail.internet.MimeMessage
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
@@ -37,30 +37,19 @@ class UserController(val userService: UserService, val jwtService: JwtService, v
                 ResponseEntity("User already exists", HttpStatus.CONFLICT)
             else {
                 val newUser = userService.save(user)
-                val confirmationToken = ConfirmationToken(newUser)
-                confirmationTokenService.addConfirmationToken(confirmationToken)
-                val mailMessage = SimpleMailMessage()
-                val link = "https://theta-risk.com/confirm?token=" + confirmationToken.confirmationToken
-                mailMessage.setTo(newUser.email)
-                mailMessage.setSubject("Confirm your email address!")
-                mailMessage.setFrom("no-reply@theta-risk.com")
-                mailMessage.setText("Hello " +  newUser.displayName + ", click this link to confirm your account: " + link + "(you can ignore this tokenId: " + confirmationToken.confirmationToken + ")")
-
-                emailService.sendEmail(mailMessage)
-
                 return ResponseEntity.ok(newUser)
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             return ResponseEntity.badRequest().body(MessageDTO(e.message.toString()))
         }
     }
 
     @PostMapping("/confirm-account")
-    fun confirmAccount(@RequestBody token: String) : ResponseEntity<Any>{
+    fun confirmAccount(@RequestBody token: String): ResponseEntity<Any> {
         val confirmationToken = confirmationTokenService.findByConfirmationToken(token);
 
-        if(confirmationToken != null){
-           val userToUpdate = userService.findById(confirmationToken.userEntity!!.userId)
+        if (confirmationToken != null) {
+            val userToUpdate = userService.findById(confirmationToken.userEntity!!.userId)
             userToUpdate.get().isEnabled = true;
             val updatedUser = userService.save(userToUpdate.get())
             return ResponseEntity.ok(updatedUser)
@@ -68,11 +57,29 @@ class UserController(val userService: UserService, val jwtService: JwtService, v
         return ResponseEntity.badRequest().body(MessageDTO("Not matching confirmationtoken found in database!"))
     }
 
+    @PostMapping("/send-confirmation-email")
+    fun sendConfirmationEmail(@RequestBody email: String): ResponseEntity<Any> {
+        try{
+            val user = userService.findByEmail(email)
+                    ?: return ResponseEntity.badRequest().body(MessageDTO("No user found"))
+            val confirmationToken = ConfirmationToken(user)
+            confirmationTokenService.addConfirmationToken(confirmationToken)
+            val link = "https://theta-risk.com/game/confirm?token="
+            val msg = "<h1>Hello, ${user.displayName}!</h1><br><p>Confirm your account in the next 24hr using this $link$confirmationToken</p><p>Token for development testing: ${confirmationToken.confirmationToken}"
+            emailService.sendMail("no-reply@theta-risk.com", email, "Confirm your account!", msg)
+
+            return ResponseEntity.ok(user)
+        }catch (e: Exception){
+            log.error(e.message.toString());
+            return ResponseEntity.badRequest().body(MessageDTO("Couldnt send confirmation email"))
+        }
+    }
+
     @PostMapping("/login")
     fun login(@RequestBody body: LoginDTO, response: HttpServletResponse): ResponseEntity<Any> {
         val user = userService.findByEmail(body.email)
                 ?: return ResponseEntity.badRequest().body(MessageDTO("User not found!"))
-        if(!user.isEnabled)
+        if (!user.isEnabled)
             return ResponseEntity.badRequest().body(MessageDTO("User is not yet confirmed! Check your email: + " + user.email))
         val responseHeaders = HttpHeaders()
         return if (!BCryptPasswordEncoder().matches(body.password, user.password))
@@ -128,30 +135,27 @@ class UserController(val userService: UserService, val jwtService: JwtService, v
     }
 
     @PostMapping("/send-forgot-password-email")
-    fun forgotPasswordEmail(@RequestBody email: String) : ResponseEntity<Any>{
+    fun forgotPasswordEmail(@RequestBody email: String): ResponseEntity<Any> {
         val user = userService.findByEmail(email)
                 ?: return ResponseEntity.badRequest().body(MessageDTO("No user found with the supplied email!"))
         val resetPasswordToken = ResetPasswordToken(user)
         resetPasswordTokenService.addResetPasswordToken(resetPasswordToken)
-        val mailMessage = SimpleMailMessage()
-        mailMessage.setTo(user.email)
-        mailMessage.setSubject("Reset password")
-        mailMessage.setFrom("no-reply@theta-risk.com")
-        mailMessage.setText("Hello " +  user.displayName + ", click this link to reset your password:  https://theta-risk.com/reset-password?user=simon.lauwers@telenet.be (you can ignore this tokenId " + resetPasswordToken.resetPasswordToken + ")")
-        emailService.sendEmail(mailMessage)
+        val link = "https://theta-risk.com/reset-password?user="
+        val msg = "<h1>Hello $user.displayName</h1><br><p>click this $link$email to reset your password.</p><p>Token for development ${resetPasswordToken.resetPasswordToken}</p>"
+        emailService.sendMail("no-reply@theta-risk.com", user.email, "Password reset", msg)
         return ResponseEntity.ok(MessageDTO("Reset email sent!"))
     }
 
     @PostMapping("/reset-password")
-    fun resetPassword(@RequestBody passwordDto: ResetPasswordDto) : ResponseEntity<Any> {
-        if(passwordDto.confirmNewPassword != passwordDto.confirmNewPassword)
+    fun resetPassword(@RequestBody passwordDto: ResetPasswordDto): ResponseEntity<Any> {
+        if (passwordDto.confirmNewPassword != passwordDto.confirmNewPassword)
             return ResponseEntity.badRequest().body(MessageDTO("Passwords dont match!"))
 
         val resetPasswordToken = resetPasswordTokenService.findByConfirmationToken(passwordDto.resetPasswordToken)
         val user = userService.findByEmail(resetPasswordToken!!.userEntity!!.email)
-        return if(user == null){
+        return if (user == null) {
             ResponseEntity.badRequest().body(MessageDTO("Couldnt find a user with the specified email!"))
-        }else{
+        } else {
             user.password = BCryptPasswordEncoder().encode(passwordDto.newPassword)
             userService.save(user)
             ResponseEntity.ok(user)
