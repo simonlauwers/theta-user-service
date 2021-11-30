@@ -12,17 +12,10 @@ import java.util.*
 
 
 @Service
-class EmailService(val javaMailSender: JavaMailSender, val confirmationTokenRepository: ConfirmationTokenRepository) {
+class EmailService(val javaMailSender: JavaMailSender) {
     @Async
     fun sendEmail(email: SimpleMailMessage?) {
         javaMailSender.send(email)
     }
 
-    fun addConfirmationToken(token: ConfirmationToken): ConfirmationToken {
-        return confirmationTokenRepository.save(token)
-    }
-
-    fun findByConfirmationToken(token: String) : ConfirmationToken?{
-        return confirmationTokenRepository.findByConfirmationToken(token)
-    }
 }
