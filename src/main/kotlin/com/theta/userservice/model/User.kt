@@ -32,7 +32,10 @@ class User {
     @Length(min = 6)
     var displayName = ""
 
+    @Column
     var profilePicture = "https://commons.wikimedia.org/wiki/File:Default_pfp.jpg"
 
+    @Column
     var isEnabled = false;
+
 }
