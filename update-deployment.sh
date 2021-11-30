@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RESPONSE_CODE=$(curl --write-out '%{http_code}' --silent --output /dev/null theta-risk.com)
+RESPONSE_CODE=$(curl --write-out '%{http_code}' --silent --output /dev/null https://theta-risk.com)
 
 if [[ $RESPONSE_CODE -ne 200  ]]
 then
