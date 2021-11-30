@@ -27,7 +27,7 @@ class JwtService {
 
     // we could use a different jwt per different endpoint, each with his own secret key and exp time
     fun create(user: User): String {
-        val issuer = user.uuid.toString();
+        val issuer = user.userId.toString();
         return Jwts.builder()
                 .setIssuer(issuer)
                 .setExpiration(Date(System.currentTimeMillis() + 60 * 24 * 1000)) // 1 day

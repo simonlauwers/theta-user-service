@@ -3,10 +3,9 @@ package com.theta.userservice.dto
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 
-data class RegisterDTO (
-        val displayName: String = "",
-        @get:Email(message = "Not a valid email!")
-        val email: String = "",
-        @get:NotBlank(message = "Password should not be blank!")
-        val password: String = ""
-)
+class RegisterDTO {
+        val displayName = ""
+        val email = ""
+        val password = ""
+        val profilePicture = "https://commons.wikimedia.org/wiki/File:Default_pfp.jpg"
+}
