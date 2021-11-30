@@ -39,4 +39,7 @@ class User {
     @Column
     var isEnabled = false;
 
+    @Column
+    var isEnabled = false;
+
 }

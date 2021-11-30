@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
 	id("org.springframework.boot") version "2.6.0"
@@ -40,18 +42,29 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security:2.2.0.RELEASE")
 	compileOnly("org.projectlombok:lombok:1.18.22")
 	annotationProcessor("org.projectlombok:lombok:1.18.22")
+	implementation("com.google.code.gson:gson:2.8.9")
 
 	testCompileOnly("org.projectlombok:lombok:1.18.22")
 	testAnnotationProcessor("org.projectlombok:lombok:1.18.22")
 	// testing
-	testImplementation("io.cucumber:cucumber-junit:4.2.0")
-	implementation("io.cucumber:cucumber-java8:4.2.0")
-	testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-	implementation("io.cucumber:cucumber-spring:4.2.0")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("io.rest-assured:rest-assured:3.0.0")
+	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:1.6.0")
+	testImplementation("io.rest-assured:kotlin-extensions:4.4.0")
+	implementation("io.rest-assured:json-schema-validator:3.0.0")
+	testImplementation("org.springframework.boot:spring-boot-starter-test:1.5.7.RELEASE")
 
 
+
+}
+
+tasks.test {
+	useJUnitPlatform()
+	testLogging {
+		events(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
+		exceptionFormat = TestExceptionFormat.SHORT
+		showCauses = true
+		showExceptions = true
+		showStackTraces = true
+	}
 }
 
 tasks.withType<KotlinCompile> {
