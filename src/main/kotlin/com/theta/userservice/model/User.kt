@@ -33,4 +33,7 @@ class User {
     @Column
     var profilePictureSrc = "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png" //default profile picture
 
+    @Column
+    var isEnabled = false;
+
 }
