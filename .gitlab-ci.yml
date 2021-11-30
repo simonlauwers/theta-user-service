@@ -27,6 +27,7 @@ gradle-build:
   image: gradle:alpine
   only:
     - main
+    - staging
   except:
     - tags
   stage: build
@@ -45,6 +46,9 @@ docker-build:
   stage: package
   except:
     - tags
+  only:
+    - main
+    - staging
   script:
     - CONTAINER="$(echo $CONTAINER_NAME):$(cat version.txt)"
     - echo $CONTAINER
@@ -59,6 +63,9 @@ docker-push:
   stage: push
   except:
     - tags
+  only:
+    - main
+    - staging
   before_script:
     - base64 -d $GCP_SA_KEY | docker login -u _json_key --password-stdin https://eu.gcr.io
   script:
@@ -70,6 +77,9 @@ tag-release:
   stage: tag-release
   except:
   - tags
+  only:
+  - main
+  - staging
   image: ubuntu
   before_script:
     - apt-get -y update
@@ -78,7 +88,7 @@ tag-release:
     - git config --global user.email "${GITLAB_USER_EMAIL}"
   script:
     - | 
-      git tag "$(cat version.txt)"
+      git tag "$(echo $CI_COMMIT_BRANCH)-$(cat version.txt)"
       git push --tags http://verhelstquinten:$PAT_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:main
 
 
