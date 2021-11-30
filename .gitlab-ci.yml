@@ -46,6 +46,9 @@ docker-build:
   stage: package
   except:
     - tags
+  only:
+    - main
+    - staging
   script:
     - CONTAINER="$(echo $CONTAINER_NAME):$(cat version.txt)"
     - echo $CONTAINER
@@ -60,6 +63,9 @@ docker-push:
   stage: push
   except:
     - tags
+  only:
+    - main
+    - staging
   before_script:
     - base64 -d $GCP_SA_KEY | docker login -u _json_key --password-stdin https://eu.gcr.io
   script:
@@ -71,6 +77,9 @@ tag-release:
   stage: tag-release
   except:
   - tags
+  only:
+  - main
+  - staging
   image: ubuntu
   before_script:
     - apt-get -y update
