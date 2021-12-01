@@ -18,7 +18,7 @@ class ResetPasswordToken {
     @Temporal(TemporalType.TIMESTAMP)
     var createdDate: Date? = null
 
-    @OneToOne(targetEntity = User::class, fetch = FetchType.EAGER)
+    @OneToOne(targetEntity = User::class, fetch = FetchType.EAGER, cascade = [CascadeType.REMOVE])
     @JoinColumn(nullable = false, name = "user_id", columnDefinition = "VARCHAR(36)")
     var userEntity: User? = null
 

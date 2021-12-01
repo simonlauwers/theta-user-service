@@ -11,11 +11,9 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.mail.SimpleMailMessage
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.util.*
-import javax.mail.internet.MimeMessage
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
@@ -68,7 +66,7 @@ class UserController(val userService: UserService, val jwtService: JwtService, v
             val msg = "<h1>Hello, ${user.displayName}!</h1><br><p>Confirm your account in the next 24hr using this $link$confirmationToken</p><p>Token for development testing: ${confirmationToken.confirmationToken}"
             emailService.sendMail("no-reply@theta-risk.com", email, "Confirm your account!", msg)
 
-            return ResponseEntity.ok(user)
+            return ResponseEntity.ok(MessageDTO("Confirmation email sent!"))
         }catch (e: Exception){
             log.error(e.message.toString());
             return ResponseEntity.badRequest().body(MessageDTO("Couldnt send confirmation email"))
@@ -148,7 +146,7 @@ class UserController(val userService: UserService, val jwtService: JwtService, v
 
     @PostMapping("/reset-password")
     fun resetPassword(@RequestBody passwordDto: ResetPasswordDto): ResponseEntity<Any> {
-        if (passwordDto.confirmNewPassword != passwordDto.confirmNewPassword)
+        if (passwordDto.confirmNewPassword != passwordDto.newPassword)
             return ResponseEntity.badRequest().body(MessageDTO("Passwords dont match!"))
 
         val resetPasswordToken = resetPasswordTokenService.findByConfirmationToken(passwordDto.resetPasswordToken)

@@ -14,4 +14,10 @@ class ConfirmationTokenService(val confirmationTokenRepository: ConfirmationToke
     fun findByConfirmationToken(token: String) : ConfirmationToken?{
         return confirmationTokenRepository.findByConfirmationToken(token)
     }
+
+    /* FOR TESTING PURPOSES ONLY!!! */
+    fun deleteAll(){
+        return confirmationTokenRepository.deleteAll();
+    }
+
 }

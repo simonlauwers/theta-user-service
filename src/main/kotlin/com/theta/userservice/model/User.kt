@@ -8,8 +8,7 @@ import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Email
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.Pattern
+
 
 @Entity
 @Getter
@@ -39,7 +38,14 @@ class User {
     @Column
     var isEnabled = false;
 
-    @Column
-    var isEnabled = false;
 
+    constructor(email:String, password:String, displayName: String, isEnabled: Boolean) {
+        this.email = email
+        this.password = password
+        this.displayName = displayName
+        this.isEnabled = isEnabled
+    } // getters and setters
+    constructor(){
+
+    }
 }
