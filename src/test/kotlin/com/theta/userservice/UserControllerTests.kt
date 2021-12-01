@@ -4,8 +4,7 @@ package com.theta.userservice
 
 import com.google.gson.Gson
 import com.theta.userservice.dto.RegisterDTO
-import com.theta.userservice.model.ConfirmationToken
-import com.theta.userservice.model.User
+
 import com.theta.userservice.service.ConfirmationTokenService
 import com.theta.userservice.service.JwtService
 import com.theta.userservice.service.ResetPasswordTokenService
@@ -16,7 +15,6 @@ import io.restassured.config.LogConfig
 import io.restassured.config.RestAssuredConfig
 import io.restassured.filter.log.LogDetail
 import io.restassured.http.ContentType
-import io.restassured.matcher.ResponseAwareMatcher
 import io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
@@ -92,5 +90,4 @@ class UserControllerTests  @Autowired constructor(val userService: UserService, 
             statusCode(HttpStatus.SC_OK)
         }
     }
-
 }

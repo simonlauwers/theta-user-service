@@ -1,7 +1,5 @@
 package com.theta.userservice.model
 
-import lombok.Getter
-import lombok.Setter
 import org.hibernate.annotations.Type
 import org.hibernate.validator.constraints.Length
 import java.util.*
@@ -11,8 +9,6 @@ import javax.validation.constraints.Email
 
 
 @Entity
-@Getter
-@Setter
 class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
