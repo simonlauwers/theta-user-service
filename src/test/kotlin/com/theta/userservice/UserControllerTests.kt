@@ -4,6 +4,7 @@ package com.theta.userservice
 
 import com.google.gson.Gson
 import com.theta.userservice.dto.RegisterDTO
+import com.theta.userservice.model.User
 
 import com.theta.userservice.service.ConfirmationTokenService
 import com.theta.userservice.service.JwtService
@@ -26,11 +27,14 @@ import org.junit.After
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests
+import javax.transaction.Transactional
 
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserControllerTests  @Autowired constructor(val userService: UserService, val confirmationTokenService: ConfirmationTokenService, val jwtService: JwtService, val resetPasswordTokenService: ResetPasswordTokenService) {
+class UserControllerTests  @Autowired constructor(val userService: UserService, val confirmationTokenService: ConfirmationTokenService, val jwtService: JwtService, val resetPasswordTokenService: ResetPasswordTokenService)
+     {
     private val gson = Gson()
     companion object {
         lateinit var requestSpecification: RequestSpecification
@@ -50,19 +54,20 @@ class UserControllerTests  @Autowired constructor(val userService: UserService, 
                 .setConfig(config)
                 .build()
 
+        // test data
+        userService.save(User("simon.lauwers4@gmail.com", "Clubvantstad01", "RadjaFanAccount", false))
+
+
     }
 
     @AfterAll
     fun tearDown(){
-        resetPasswordTokenService.deleteAll()
-        confirmationTokenService.deleteAll()
-        userService.deleteAll()
         RestAssured.reset()
     }
 
 
-
     @Test
+    @Transactional
     @Order(1)
     fun `register a single user`() {
         val reqBody = gson.toJson(RegisterDTO("simonlauw", "simon.lauwers@telenet.be", "Badeendjes1972"))
@@ -78,10 +83,11 @@ class UserControllerTests  @Autowired constructor(val userService: UserService, 
     }
 
     @Test
+    @Transactional
     @Order(2)
     fun `send confirmation email`() {
         Given {
-            spec(requestSpecification).body("simon.lauwers@telenet.be")
+            spec(requestSpecification).body("simon.lauwers4@gmail.com")
         } When {
             post("/send-confirmation-email")
         } Then {
