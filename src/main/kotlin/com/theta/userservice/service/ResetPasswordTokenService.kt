@@ -15,4 +15,9 @@ class ResetPasswordTokenService(val resetPasswordTokenRepository: ResetPasswordT
     fun findByConfirmationToken(token: String): ResetPasswordToken? {
         return resetPasswordTokenRepository.findByResetPasswordToken(token)
     }
+
+    /* FOR TESTING PURPOSES ONLY!!! */
+    fun deleteAll(){
+        return resetPasswordTokenRepository.deleteAll();
+    }
 }

@@ -31,4 +31,9 @@ class UserService(val userRepository: UserRepository) {
         return null
 
     }
+
+    /* FOR TESTING PURPOSES ONLY!!! */
+    fun deleteAll(){
+        return userRepository.deleteAll();
+    }
 }

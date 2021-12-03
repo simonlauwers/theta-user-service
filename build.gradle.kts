@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.theta"
-version = "0.4.2"
+version = "0.5.0"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {
@@ -36,8 +36,20 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.10.2")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.10.2")
 	implementation("org.springframework.boot:spring-boot-starter-security:2.2.0.RELEASE")
+	implementation("com.google.code.gson:gson:2.8.9")
 	implementation("org.springframework.boot:spring-boot-starter-mail:1.2.0.RELEASE")
+	// testing
+	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:1.6.0")
+	testImplementation("io.rest-assured:kotlin-extensions:4.4.0")
+	implementation("io.rest-assured:json-schema-validator:3.0.0")
+	testImplementation("org.springframework.boot:spring-boot-starter-test:1.5.7.RELEASE")
 
+
+
+}
+
+tasks.test {
+	useJUnitPlatform()
 }
 
 tasks.withType<KotlinCompile> {
