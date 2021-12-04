@@ -17,6 +17,10 @@ class UserService(val userRepository: UserRepository) {
         return userRepository.findByEmail(email)
     }
 
+    fun findByDisplayName(name: String) : User? {
+        return userRepository.findByDisplayName(name);
+    }
+
     fun findById(id: UUID) : Optional<User> {
         return userRepository.findById(id)
     }
