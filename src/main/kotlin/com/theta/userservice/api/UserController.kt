@@ -7,7 +7,6 @@ import com.theta.userservice.model.ConfirmationToken
 import com.theta.userservice.model.ResetPasswordToken
 import com.theta.userservice.model.User
 import com.theta.userservice.service.*
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -51,10 +50,10 @@ class UserController(val userService: UserService, val jwtService: JwtService, v
     @PostMapping("/confirm-account")
     fun confirmAccount(@RequestBody tokenDTO: TokenDTO): ResponseEntity<Any> {
         val confirmationToken = confirmationTokenService.findByConfirmationToken(tokenDTO.token)
-                ?: return ResponseEntity.badRequest().body(MessageDTO("confirmationtoken/not-found", 200, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
+                ?: return ResponseEntity.badRequest().body(MessageDTO("confirmationtoken/not-found", 200, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)))
 
         val userToUpdate = userService.findById(confirmationToken.userEntity!!.userId)
-        userToUpdate.get().isEnabled = true;
+        userToUpdate.get().isEnabled = true
         val updatedUser = userService.save(userToUpdate.get())
         return ResponseEntity.ok(updatedUser)
 
@@ -71,7 +70,6 @@ class UserController(val userService: UserService, val jwtService: JwtService, v
             val link = "https://theta-risk.com/game/confirm?token="
             val msg = "<h1>Hello, ${user.displayName}!</h1><br><p>Confirm your account in the next 24hr using this <a href=\"${link}${confirmationToken.confirmationToken}\">link</a></p><p>Token for development testing: ${confirmationToken.confirmationToken}"
             emailService.sendMail("no-reply@theta-risk.com", emailDTO.email, "Confirm your account!", msg)
-
             return ResponseEntity.status(200).body(MessageDTO("email/confirmation-sent", 200, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)))
         } catch (e: Exception) {
             return ResponseEntity.status(400).body(MessageDTO("user/invalid-email", 400, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)))
@@ -85,7 +83,6 @@ class UserController(val userService: UserService, val jwtService: JwtService, v
                 ?: return ResponseEntity.status(404).body(MessageDTO("user/not-found", 404, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)))
         if (!user.isEnabled)
             return ResponseEntity.badRequest().body(MessageDTO("user/not-confirmed", 400, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)))
-        val responseHeaders = HttpHeaders()
         return if (!BCryptPasswordEncoder().matches(body.password, user.password))
             ResponseEntity.badRequest().body(MessageDTO("user/invalid-password", 400, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)))
         else {
