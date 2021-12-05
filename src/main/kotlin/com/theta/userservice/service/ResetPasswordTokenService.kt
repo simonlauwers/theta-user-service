@@ -16,8 +16,4 @@ class ResetPasswordTokenService(val resetPasswordTokenRepository: ResetPasswordT
         return resetPasswordTokenRepository.findByResetPasswordToken(token)
     }
 
-    /* FOR TESTING PURPOSES ONLY!!! */
-    fun deleteAll(){
-        return resetPasswordTokenRepository.deleteAll();
-    }
 }

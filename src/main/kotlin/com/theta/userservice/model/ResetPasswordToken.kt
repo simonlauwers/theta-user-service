@@ -4,7 +4,7 @@ import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*
 
-@Entity
+@Entity(name ="reset_password_tokens")
 class ResetPasswordToken {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

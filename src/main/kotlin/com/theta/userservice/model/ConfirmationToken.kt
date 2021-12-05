@@ -7,7 +7,7 @@ import java.util.*
 import javax.persistence.*
 
 
-@Entity
+@Entity(name = "confirmation_tokens")
 class ConfirmationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
