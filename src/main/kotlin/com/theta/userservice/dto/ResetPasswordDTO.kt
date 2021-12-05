@@ -1,6 +1,6 @@
 package com.theta.userservice.dto
 
-class ResetPasswordDto {
+class ResetPasswordDTO {
     val newPassword = ""
     val confirmNewPassword = ""
     val resetPasswordToken =""

@@ -33,11 +33,5 @@ class UserService(val userRepository: UserRepository) {
             return userRepository.save(user)
         }
         return null
-
-    }
-
-    /* FOR TESTING PURPOSES ONLY!!! */
-    fun deleteAll(){
-        return userRepository.deleteAll();
     }
 }
