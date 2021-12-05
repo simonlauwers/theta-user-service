@@ -44,11 +44,11 @@ gradle-build:
 
 docker-build:
   stage: package
-  except:
-    - tags
   only:
     - main
     - staging
+  except:
+    - tags
   script:
     - CONTAINER="$(echo $CONTAINER_NAME):$(cat version.txt)"
     - echo $CONTAINER
@@ -61,11 +61,11 @@ docker-build:
 
 docker-push:
   stage: push
-  except:
-    - tags
   only:
     - main
     - staging
+  except:
+    - tags
   before_script:
     - base64 -d $GCP_SA_KEY | docker login -u _json_key --password-stdin https://eu.gcr.io
   script:
@@ -75,12 +75,12 @@ docker-push:
 
 tag-release:
   stage: tag-release
-  except:
-  - tags
   only:
   - main
   - staging
   image: ubuntu
+  except:
+    - tags
   before_script:
     - apt-get -y update
     - apt-get -y install git
@@ -89,16 +89,16 @@ tag-release:
   script:
     - | 
       git tag "$(echo $CI_COMMIT_BRANCH)-$(cat version.txt)"
-      git push --tags http://verhelstquinten:$PAT_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:main
+      git push --tags http://verhelstquinten:$PAT_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git "HEAD:$(echo $CI_COMMIT_BRANCH)"
 
 
 gcloud-deploy-staging:
   stage: deploy-staging
   image: google/cloud-sdk
-  except:
-    - tags
   only:
     - staging
+  except:
+    - tags
   script:
     - CONTAINER="$(echo $CONTAINER_NAME):$(cat version.txt)"
     - base64 -d $GCP_SA_KEY > ~/encoded_serviceaccount.json
@@ -111,10 +111,10 @@ gcloud-deploy-staging:
 gcloud-deploy-production:
   stage: deploy-production
   image: google/cloud-sdk
-  except:
-    - tags
   only:
     - main
+  except:
+    - tags
   script:
     - CONTAINER="$(echo $CONTAINER_NAME):$(cat version.txt)"
     - base64 -d $GCP_SA_KEY > ~/encoded_serviceaccount.json
