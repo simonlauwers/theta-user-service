@@ -1,4 +1,4 @@
-package com.theta.userservice.model
+package com.theta.userservice.domain.model
 
 import org.hibernate.annotations.Type
 import java.util.*

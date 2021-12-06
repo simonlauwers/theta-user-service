@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.theta"
-version = "0.7.0"
+version = "0.7.1"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {
@@ -38,14 +38,12 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security:2.6.1")
 	implementation("com.google.code.gson:gson:2.8.9")
 	implementation("org.springframework.boot:spring-boot-starter-mail:2.5.6")
+
 	// testing
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:1.6.0")
 	testImplementation("io.rest-assured:kotlin-extensions:4.4.0")
 	implementation("io.rest-assured:json-schema-validator:4.4.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test:1.5.7.RELEASE")
-
-
-
 }
 
 tasks.test {

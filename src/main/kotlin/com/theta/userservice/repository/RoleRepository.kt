@@ -1,6 +1,6 @@
 package com.theta.userservice.repository
 
-import com.theta.userservice.model.Role
+import com.theta.userservice.domain.model.Role
 import org.springframework.data.repository.CrudRepository
 import java.util.*
 

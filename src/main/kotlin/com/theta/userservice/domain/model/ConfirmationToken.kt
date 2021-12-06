@@ -1,7 +1,5 @@
-package com.theta.userservice.model
+package com.theta.userservice.domain.model
 
-import lombok.Getter
-import org.hibernate.annotations.Cascade
 import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*
@@ -21,7 +19,7 @@ class ConfirmationToken {
     @Temporal(TemporalType.TIMESTAMP)
     var createdDate: Date? = null
 
-    @OneToOne(targetEntity = User::class, fetch = FetchType.EAGER, cascade = [CascadeType.REMOVE])
+    @OneToOne(targetEntity = User::class, fetch = FetchType.EAGER, cascade = [CascadeType.REMOVE], orphanRemoval = true)
     @JoinColumn(nullable = false, name = "user_id", columnDefinition = "VARCHAR(36)")
     var userEntity: User? = null
 

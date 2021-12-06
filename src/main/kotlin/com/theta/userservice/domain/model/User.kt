@@ -1,4 +1,4 @@
-package com.theta.userservice.model
+package com.theta.userservice.domain.model
 
 import org.hibernate.annotations.Type
 import org.hibernate.validator.constraints.Length
@@ -34,13 +34,13 @@ class User {
     var profilePicture = "https://commons.wikimedia.org/wiki/File:Default_pfp.jpg"
 
     @Column
-    var isEnabled = false;
+    var isEnabled = false
 
     @Column
-    var isBanned = false;
+    var isBanned = false
 
     @Column
-    var lastLogin = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    var lastLogin = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
     @OneToOne(targetEntity = Role::class, fetch = FetchType.EAGER, cascade = [CascadeType.REMOVE])
     @JoinColumn(nullable = false, name = "role_id", columnDefinition = "VARCHAR(36)")
