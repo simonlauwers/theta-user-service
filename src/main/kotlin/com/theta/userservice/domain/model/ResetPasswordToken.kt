@@ -1,22 +1,19 @@
-package com.theta.userservice.model
+package com.theta.userservice.domain.model
 
-import lombok.Getter
-import org.hibernate.annotations.Cascade
 import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*
 
-
-@Entity
-class ConfirmationToken {
+@Entity(name ="reset_password_tokens")
+class ResetPasswordToken {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Type(type="uuid-char")
     @Column(name = "token_id", columnDefinition = "VARCHAR(36)")
     val tokenId: UUID = UUID.randomUUID()
 
-    @Column(name = "confirmation_token", unique = true)
-    var confirmationToken: String? = null
+    @Column(unique = true)
+    var resetPasswordToken: String? = null
 
     @Temporal(TemporalType.TIMESTAMP)
     var createdDate: Date? = null
@@ -29,6 +26,6 @@ class ConfirmationToken {
     constructor(userEntity: User?) {
         this.userEntity = userEntity
         createdDate = Date()
-        confirmationToken = UUID.randomUUID().toString()
+        resetPasswordToken = UUID.randomUUID().toString()
     } // getters and setters
 }

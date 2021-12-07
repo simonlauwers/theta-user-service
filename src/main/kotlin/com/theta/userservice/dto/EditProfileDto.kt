@@ -1,9 +1,6 @@
 package com.theta.userservice.dto
 
-import javax.validation.constraints.Email
-import javax.validation.constraints.NotBlank
-
-class EditProfileDTO {
+class EditProfileDto {
     val email = ""
     val displayName =""
 

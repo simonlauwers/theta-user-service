@@ -1,8 +1,14 @@
 {
-  "userId": "4a9a962b-cfe6-43b7-acf2-3ae38d8bf6e9",
-  "email": "simon.lauwers@telenet.be",
-  "password": "$2a$10$.1Dupd83vUuUgtY5pqPQE./ZVTQSQnGq589CNePYKX/qQ/PJTuwOW",
-  "displayName": "simonlauwers",
+  "userId": "3274f108-d739-4ea0-afbd-a91945b56d89",
+  "email": "jeroen.lauwers@telenet.be",
+  "password": "$2a$10$vOWk8lK6evotluY6dxaigutLM7p3qq.G9r2HY3JaHPUF7eUrSi4ey",
+  "displayName": "Simonlauwers",
   "profilePicture": "https://commons.wikimedia.org/wiki/File:Default_pfp.jpg",
-  "isEnabled": false
+  "isEnabled": false,
+  "isBanned": false,
+  "lastLogin": "2021-12-05T16:36:27.7060674",
+  "role": {
+    "name": "user",
+    "roleId": "2c409dfa-9c50-4579-abc9-b3c63d3b0b9c"
+  }
 }

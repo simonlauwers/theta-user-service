@@ -1,24 +1,25 @@
-package com.theta.userservice.model
+package com.theta.userservice.domain.model
 
 import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*
 
-@Entity
-class ResetPasswordToken {
+
+@Entity(name = "confirmation_tokens")
+class ConfirmationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Type(type="uuid-char")
     @Column(name = "token_id", columnDefinition = "VARCHAR(36)")
     val tokenId: UUID = UUID.randomUUID()
 
-    @Column(unique = true)
-    var resetPasswordToken: String? = null
+    @Column(name = "confirmation_token", unique = true)
+    var confirmationToken: String? = null
 
     @Temporal(TemporalType.TIMESTAMP)
     var createdDate: Date? = null
 
-    @OneToOne(targetEntity = User::class, fetch = FetchType.EAGER, cascade = [CascadeType.REMOVE])
+    @OneToOne(targetEntity = User::class, fetch = FetchType.EAGER, cascade = [CascadeType.REMOVE], orphanRemoval = true)
     @JoinColumn(nullable = false, name = "user_id", columnDefinition = "VARCHAR(36)")
     var userEntity: User? = null
 
@@ -26,6 +27,6 @@ class ResetPasswordToken {
     constructor(userEntity: User?) {
         this.userEntity = userEntity
         createdDate = Date()
-        resetPasswordToken = UUID.randomUUID().toString()
+        confirmationToken = UUID.randomUUID().toString()
     } // getters and setters
 }
