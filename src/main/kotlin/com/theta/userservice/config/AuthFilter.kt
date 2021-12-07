@@ -20,15 +20,17 @@ class AuthFilter(val jwtService: JwtService) : HandlerInterceptor {
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         try {
-            if(request.cookies == null) throw UnauthorizedException("user/unauthorized")
-            val jwtCookie = request.cookies.filter { cookie ->  cookie.name == "jwt"}[0].value
-            // throws exceptions if the jwt is not valid
-            jwtService.getJwtClaims(jwtCookie)
-            return true
-        } catch (e: JwtException) {
-            log.warn(e.message)
-            return false
+            if (request.cookies == null || request.cookies.isEmpty()) throw UnauthorizedException("user/unauthorized")
+            val jwtCookie = request.cookies.filter { cookie -> cookie.name == "jwt" }
+            if(jwtCookie.isEmpty())
+                throw UnauthorizedException("user/unauthorized")
+            val jwtValue = jwtCookie[0].value
 
+            // throws exceptions if the jwt is not valid
+            jwtService.getJwtClaims(jwtValue)
+            return true
+        } catch (e: Exception) {
+            throw UnauthorizedException("user/unauthorized")
         }
     }
 
