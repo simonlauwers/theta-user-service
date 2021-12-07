@@ -43,8 +43,7 @@ class UserControllerTests @Autowired constructor(val userService: UserService, v
     fun setup() {
         val logConfig = LogConfig.logConfig().enableLoggingOfRequestAndResponseIfValidationFails(LogDetail.ALL)
         val config = RestAssuredConfig.config().logConfig(logConfig)
-
-        requestSpecification = RequestSpecBuilder().setBaseUri("http://localhost:8080").setContentType(ContentType.JSON).setRelaxedHTTPSValidation().setConfig(config).build()
+        requestSpecification = RequestSpecBuilder().setBaseUri("http://localhost:8081").setContentType(ContentType.JSON).setRelaxedHTTPSValidation().setConfig(config).build()
         // test data
         val simon = userService.save(User("simon.lauwers4@gmail.com", "Clubvantstad01", "RadjaFanAccount", false, true, roleService.findByName("user")!!))
         val confirmationToken = ConfirmationToken(simon)
