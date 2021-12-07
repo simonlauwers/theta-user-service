@@ -1,5 +1,6 @@
 package com.theta.userservice.service
 
+import Sl4jLogger.Companion.log
 import com.theta.userservice.domain.model.ConfirmationToken
 import com.theta.userservice.domain.model.ResetPasswordToken
 import com.theta.userservice.dto.EmailDto
@@ -35,6 +36,7 @@ class EmailService(val mailSender: JavaMailSender, val userService: UserService,
         val link = "https://theta-risk.com/game/confirm?token="
         val msg = "<h1>Hello, ${user.displayName}!</h1><br><p>Confirm your account in the next 24hr using this <a href=\"${link}${confirmationToken.confirmationToken}\">link</a></p><p>Token for development testing: ${confirmationToken.confirmationToken}"
         sendMail("no-reply@theta-risk.com", emailDto.email, "Confirm your account!", msg)
+        log.info("confirmation email sent to " + user.email)
         return ResponseMessageDto.Builder().message("email/confirmation-sent").status(200).timeStamp(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)).build()
     }
 
@@ -46,6 +48,7 @@ class EmailService(val mailSender: JavaMailSender, val userService: UserService,
         val link = "https://theta-risk.com/reset-password?user="
         val msg = "<h1>Hello ${user.displayName}</h1><br><p>click this <a href=\"${link}${resetPasswordToken.tokenId}\">link</a> ${emailDto.email} to reset your password.</p><p>Token for development ${resetPasswordToken.resetPasswordToken}</p>"
         sendMail("no-reply@theta-risk.com", user.email, "Password reset", msg)
+        log.info("forgot password sent to " + user.email)
         return ResponseMessageDto.Builder().message("email/reset-sent").status(200).timeStamp(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)).build()
     }
 

@@ -1,9 +1,11 @@
 package com.theta.userservice.service
 
+import Sl4jLogger.Companion.log
 import com.theta.userservice.domain.exceptions.*
 import com.theta.userservice.domain.model.User
 import com.theta.userservice.dto.*
 import com.theta.userservice.repository.UserRepository
+import lombok.extern.slf4j.Slf4j
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -14,9 +16,14 @@ import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
 
 @Service
+@Slf4j
 class UserService(val userRepository: UserRepository, val roleService: RoleService, val jwtService: JwtService) {
     fun save(user: User): User {
         return findByEmail(user.email) ?: userRepository.save(user)
+    }
+
+    fun update(user:User) : User{
+        return userRepository.save(user)
     }
 
     fun findByEmail(email: String): User? {
@@ -47,6 +54,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         else if (findByDisplayName(user.displayName) != null) {
             throw UserDisplayNameConflict("user/display-name-conflict")
         } else {
+            log.info("user " + user.email + " has been registered!")
             save(user)
         }
     }
@@ -68,15 +76,45 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
             val cookie = Cookie("jwt", jwt)
             cookie.isHttpOnly = true
             response.addCookie(cookie)
+            log.info("user " + user.email + " succesfully logged in!")
             return user
         }
     }
 
     fun editProfile(editProfileDto: EditProfileDto, jwt: String?): User {
-        jwtService.checkJwtWithUser(jwt, editProfileDto.displayName, editProfileDto.email)
+        checkJwtWithUser(jwt, editProfileDto.displayName, editProfileDto.email)
         val user = findByEmail(editProfileDto.email) ?: throw EntityNotFoundException("user/not-found")
         user.displayName = editProfileDto.displayName
         user.profilePicture = editProfileDto.profilePicture
+        log.info("userprofile " + user.email + " was edited!")
         return userRepository.save(user)
+    }
+
+    fun whoAmI(jwt: String?) : User{
+        if (jwt == null) {
+            throw UnauthorizedException("user/unauthorized")
+        }
+        val body = jwtService.getJwtClaims(jwt).body
+        val user = findById(UUID.fromString(body.issuer))
+        return if (user.isPresent) {
+            user.get()
+        } else {
+            log.info("you are user: " + user.get().displayName)
+            throw EntityNotFoundException("user/not-found")
+        }
+    }
+
+    fun checkJwtWithUser(jwt: String?, displayName: String, email: String) {
+        if (jwt == null) {
+            throw UnauthorizedException("user/unauthorized")
+        }
+        val jwtUser = findById(UUID.fromString(jwtService.getJwtClaims(jwt).body.issuer))
+        val jwtEmail = jwtUser.map(User::email).orElse("")
+        if (email != jwtEmail) {
+            throw JwtEmailMismatchException("user/jwt-email-mismatch")
+        }
+        if (findByDisplayName(displayName) != null) {
+            throw UserDisplayNameConflict("user/display-name-conflict")
+        }
     }
 }

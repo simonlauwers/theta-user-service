@@ -1,16 +1,19 @@
 package com.theta.userservice.service
 
+import Sl4jLogger.Companion.log
 import com.theta.userservice.domain.exceptions.PasswordMismatchException
 import com.theta.userservice.domain.model.ResetPasswordToken
 import com.theta.userservice.domain.model.User
 import com.theta.userservice.dto.ResetPasswordDto
 import com.theta.userservice.repository.ResetPasswordTokenRepository
+import lombok.extern.slf4j.Slf4j
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 import org.springframework.stereotype.Service
 import javax.persistence.EntityNotFoundException
 
 @Service
+@Slf4j
 class ResetPasswordTokenService(val resetPasswordTokenRepository: ResetPasswordTokenRepository, val userService: UserService) {
     fun addResetPasswordToken(token: ResetPasswordToken): ResetPasswordToken {
         return resetPasswordTokenRepository.save(token)
@@ -29,6 +32,7 @@ class ResetPasswordTokenService(val resetPasswordTokenRepository: ResetPasswordT
                 ?: throw EntityNotFoundException("user/not-found")
         user.password = BCryptPasswordEncoder().encode(passwordDto.newPassword)
         userService.save(user)
+        log.info("user " + user.email + " password has been reset!")
         return user
     }
 }

@@ -12,9 +12,10 @@ import java.util.*
 import javax.annotation.PostConstruct
 import javax.crypto.SecretKey
 import javax.persistence.EntityNotFoundException
+import kotlin.math.exp
 
 @Service
-class JwtService(val userService: UserService) {
+class JwtService() {
 
     @Value("\${jwt.expiration}")
     val expiration: Int = 604800 // 1 week
@@ -34,39 +35,12 @@ class JwtService(val userService: UserService) {
         val issuer = user.userId.toString()
         return Jwts.builder()
                 .setIssuer(issuer)
-                .setExpiration(Date(System.currentTimeMillis() + 60 * 24 * 1000)) // 1 day
+                .setExpiration(Date(System.currentTimeMillis() + expiration)) // 1 day
                 .signWith(secretKey)
                 .compact()
     }
 
     fun getJwtClaims(cookieValue: String): Jws<Claims> {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(cookieValue)
-    }
-
-    fun whoAmI(jwt: String?) : User{
-        if (jwt == null) {
-            throw UnauthorizedException("user/unauthorized")
-        }
-        val body = getJwtClaims(jwt).body
-        val user = userService.findById(UUID.fromString(body.issuer))
-        return if (user.isPresent) {
-            user.get()
-        } else {
-            throw EntityNotFoundException("user/not-found")
-        }
-    }
-
-    fun checkJwtWithUser(jwt: String?, displayName: String, email: String) {
-        if (jwt == null) {
-            throw UnauthorizedException("user/unauthorized")
-        }
-        val jwtUser = userService.findById(UUID.fromString(getJwtClaims(jwt).body.issuer))
-        val jwtEmail = jwtUser.map(User::email).orElse("")
-        if (email != jwtEmail) {
-            throw JwtEmailMismatchException("user/jwt-email-mismatch")
-        }
-        if (userService.findByDisplayName(displayName) != null) {
-            throw UserDisplayNameConflict("user/display-name-conflict")
-        }
     }
 }

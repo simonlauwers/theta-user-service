@@ -6,13 +6,16 @@ import com.theta.userservice.service.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
 
 
 @RestController
-class UserController(val userService: UserService, val jwtService: JwtService, val emailService: EmailService, val confirmationTokenService: ConfirmationTokenService, val resetPasswordTokenService: ResetPasswordTokenService) {
+class UserController(val userService: UserService, val emailService: EmailService, val confirmationTokenService: ConfirmationTokenService, val resetPasswordTokenService: ResetPasswordTokenService) {
     @CrossOrigin
     @PostMapping("/register")
     fun register(@RequestBody registerDto: RegisterDto): ResponseEntity<User> {
@@ -40,7 +43,7 @@ class UserController(val userService: UserService, val jwtService: JwtService, v
     @CrossOrigin
     @GetMapping("/whoami")
     fun test(@CookieValue("jwt") jwt: String?): ResponseEntity<User> {
-        return ResponseEntity(jwtService.whoAmI(jwt), HttpStatus.ACCEPTED)
+        return ResponseEntity(userService.whoAmI(jwt), HttpStatus.ACCEPTED)
     }
 
     @CrossOrigin
@@ -63,16 +66,22 @@ class UserController(val userService: UserService, val jwtService: JwtService, v
     }
 
     /**
-     * To delete a cookie we need to create a cookie with the same name
-     * as the cookie we want to delete. We also need to set the max age of that newly created
-     * cookie to 0 and then add it to the Servlet's response method
+     * To delete the previous jwt cookie we need to create a cookie with the same name
+     * and set the value to an emtpy string and the maxAge to 0.
      */
     @CrossOrigin
     @PostMapping("/logout")
-    fun logout(@CookieValue jwt: Cookie, response: HttpServletResponse) {
+    fun logout(@CookieValue jwt: Cookie, response: HttpServletResponse) : ResponseEntity<ResponseMessageDto> {
         val cookie = Cookie("jwt", "")
+        cookie.isHttpOnly = true
         cookie.maxAge = 0
         response.addCookie(cookie)
+        return ResponseEntity(
+                ResponseMessageDto.Builder()
+                        .message("user/logged-out")
+                        .status(200)
+                        .timeStamp(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                        .build(), HttpStatus.ACCEPTED)
     }
 
 
