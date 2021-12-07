@@ -18,10 +18,11 @@ stages:
 
 test:
   stage: test
+  image: gradle:alpine
   except:
     - tags
   script:
-    - echo TODO
+    - gradle test
 
 gradle-build:
   image: gradle:alpine
