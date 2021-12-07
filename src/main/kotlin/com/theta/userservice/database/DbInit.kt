@@ -1,7 +1,7 @@
 package com.theta.userservice.database
 
-import com.theta.userservice.model.Role
-import com.theta.userservice.model.User
+import com.theta.userservice.domain.model.Role
+import com.theta.userservice.domain.model.User
 import com.theta.userservice.service.RoleService
 import com.theta.userservice.service.UserService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
