@@ -15,20 +15,17 @@ import javax.validation.Valid
 
 
 @RestController
+@CrossOrigin("http://localhost:3000")
 class UserController(val userService: UserService, val emailService: EmailService, val confirmationTokenService: ConfirmationTokenService, val resetPasswordTokenService: ResetPasswordTokenService) {
     @PostMapping("/register")
-    fun register(@RequestBody registerDto: RegisterDto): ResponseEntity<User> {
-        return ResponseEntity(userService.registerUser(registerDto), HttpStatus.CREATED)
+    fun register(@RequestBody registerDto: RegisterDto): ResponseEntity<ResponseMessageDto> {
+        val user = userService.registerUser(registerDto);
+        return ResponseEntity(emailService.sendConfirmationEmail(EmailDto(user.email)), HttpStatus.CREATED)
     }
 
     @PostMapping("/confirm-account")
     fun confirmAccount(@RequestBody tokenDTO: TokenDto): ResponseEntity<User> {
         return ResponseEntity(confirmationTokenService.confirmAccount(tokenDTO), HttpStatus.ACCEPTED)
-    }
-
-    @PostMapping("/send-confirmation-email")
-    fun sendConfirmationEmail(@RequestBody emailDTO: EmailDto): ResponseEntity<ResponseMessageDto> {
-        return ResponseEntity(emailService.sendConfirmationEmail(emailDTO), HttpStatus.ACCEPTED)
     }
 
     @CrossOrigin
@@ -50,7 +47,6 @@ class UserController(val userService: UserService, val emailService: EmailServic
     @PostMapping("/send-forgot-password-email")
     fun forgotPasswordEmail(@RequestBody emailDTO: EmailDto): ResponseEntity<ResponseMessageDto> {
         return ResponseEntity(emailService.sendForgotPasswordEmail(emailDTO), HttpStatus.ACCEPTED)
-
     }
 
     @PostMapping("/reset-password")
