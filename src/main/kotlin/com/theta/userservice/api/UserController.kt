@@ -1,5 +1,6 @@
 package com.theta.userservice.api
 
+import Sl4jLogger.Companion.log
 import com.theta.userservice.domain.model.User
 import com.theta.userservice.dto.*
 import com.theta.userservice.service.*
@@ -64,6 +65,7 @@ class UserController(val userService: UserService, val emailService: EmailServic
         cookie.isHttpOnly = true
         cookie.maxAge = 0
         response.addCookie(cookie)
+        log.info("user with jwt $jwt logged out!");
         return ResponseEntity(
                 ResponseMessageDto.Builder()
                         .message("user/logged-out")
