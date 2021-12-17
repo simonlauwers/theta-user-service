@@ -18,7 +18,7 @@ class DbInit(val roleService: RoleService, val userService: UserService) {
         // seed admin user
         if(userService.findByEmail("quinten@verhelst.dev") == null){
             userService.save(User("quinten@verhelst.dev", BCryptPasswordEncoder().encode("admin"), "Quinten",
-                    isEnabled = true, isBanned = false, roleService.findByName("admin")!!))
+                    isEnabled = true, isBanned = false, roleService.findByName("admin")!!, "https://pbs.twimg.com/profile_images/1331347002119090179/HAIk7lN2_400x400.jpg"))
         }
     }
 }

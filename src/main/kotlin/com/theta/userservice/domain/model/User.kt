@@ -53,13 +53,14 @@ class User {
         this.isEnabled = isEnabled
         this.isBanned = isBanned
     }
-    constructor(email:String, password:String, displayName: String, isEnabled: Boolean, isBanned: Boolean, role: Role) {
+    constructor(email:String, password:String, displayName: String, isEnabled: Boolean, isBanned: Boolean, role: Role, profilePicture: String) {
         this.email = email
         this.password = password
         this.displayName = displayName
         this.isEnabled = isEnabled
         this.isBanned = isBanned
         this.role = role
+        this.profilePicture = profilePicture
     }
     constructor(){
     }
