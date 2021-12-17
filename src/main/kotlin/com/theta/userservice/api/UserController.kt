@@ -1,5 +1,6 @@
 package com.theta.userservice.api
 
+import Sl4jLogger.Companion.log
 import com.theta.userservice.domain.model.User
 import com.theta.userservice.dto.*
 import com.theta.userservice.service.*
@@ -15,23 +16,17 @@ import javax.validation.Valid
 
 
 @RestController
+@CrossOrigin("http://localhost:3000")
 class UserController(val userService: UserService, val emailService: EmailService, val confirmationTokenService: ConfirmationTokenService, val resetPasswordTokenService: ResetPasswordTokenService) {
-    @CrossOrigin
     @PostMapping("/register")
-    fun register(@RequestBody registerDto: RegisterDto): ResponseEntity<User> {
-        return ResponseEntity(userService.registerUser(registerDto), HttpStatus.CREATED)
+    fun register(@RequestBody registerDto: RegisterDto): ResponseEntity<ResponseMessageDto> {
+        val user = userService.registerUser(registerDto);
+        return ResponseEntity(emailService.sendConfirmationEmail(EmailDto(user.email)), HttpStatus.CREATED)
     }
 
-    @CrossOrigin
     @PostMapping("/confirm-account")
     fun confirmAccount(@RequestBody tokenDTO: TokenDto): ResponseEntity<User> {
         return ResponseEntity(confirmationTokenService.confirmAccount(tokenDTO), HttpStatus.ACCEPTED)
-    }
-
-    @CrossOrigin
-    @PostMapping("/send-confirmation-email")
-    fun sendConfirmationEmail(@RequestBody emailDTO: EmailDto): ResponseEntity<ResponseMessageDto> {
-        return ResponseEntity(emailService.sendConfirmationEmail(emailDTO), HttpStatus.ACCEPTED)
     }
 
     @CrossOrigin
@@ -40,26 +35,21 @@ class UserController(val userService: UserService, val emailService: EmailServic
         return ResponseEntity(userService.login(loginDto, response), HttpStatus.ACCEPTED)
     }
 
-    @CrossOrigin
     @GetMapping("/whoami")
     fun test(@CookieValue("jwt") jwt: String?): ResponseEntity<User> {
         return ResponseEntity(userService.whoAmI(jwt), HttpStatus.ACCEPTED)
     }
 
-    @CrossOrigin
     @PostMapping("/edit-profile")
     fun editProfile(@CookieValue("jwt") jwt: String?, @Valid @RequestBody editProfileDto: EditProfileDto): ResponseEntity<User> {
         return ResponseEntity(userService.editProfile(editProfileDto, jwt), HttpStatus.ACCEPTED)
     }
 
-    @CrossOrigin
     @PostMapping("/send-forgot-password-email")
     fun forgotPasswordEmail(@RequestBody emailDTO: EmailDto): ResponseEntity<ResponseMessageDto> {
         return ResponseEntity(emailService.sendForgotPasswordEmail(emailDTO), HttpStatus.ACCEPTED)
-
     }
 
-    @CrossOrigin
     @PostMapping("/reset-password")
     fun resetPassword(@RequestBody passwordDto: ResetPasswordDto): ResponseEntity<User> {
         return ResponseEntity(resetPasswordTokenService.resetPassword(passwordDto), HttpStatus.ACCEPTED)
@@ -69,13 +59,13 @@ class UserController(val userService: UserService, val emailService: EmailServic
      * To delete the previous jwt cookie we need to create a cookie with the same name
      * and set the value to an emtpy string and the maxAge to 0.
      */
-    @CrossOrigin
     @PostMapping("/logout")
     fun logout(@CookieValue jwt: Cookie, response: HttpServletResponse) : ResponseEntity<ResponseMessageDto> {
         val cookie = Cookie("jwt", "")
         cookie.isHttpOnly = true
         cookie.maxAge = 0
         response.addCookie(cookie)
+        log.info("user with jwt $jwt logged out!");
         return ResponseEntity(
                 ResponseMessageDto.Builder()
                         .message("user/logged-out")
