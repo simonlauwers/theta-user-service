@@ -1,6 +1,7 @@
 package com.theta.userservice.service
 
 import Sl4jLogger.Companion.log
+import com.theta.userservice.api.controllers.messaging.MessageSender
 import com.theta.userservice.domain.exceptions.*
 import com.theta.userservice.domain.model.User
 import com.theta.userservice.dto.*
@@ -17,7 +18,7 @@ import javax.servlet.http.HttpServletResponse
 
 @Service
 @Slf4j
-class UserService(val userRepository: UserRepository, val roleService: RoleService, val jwtService: JwtService) {
+class UserService(val userRepository: UserRepository, val roleService: RoleService, val jwtService: JwtService, val messageSender: MessageSender) {
     fun save(user: User): User {
         return findByEmail(user.email) ?: userRepository.save(user)
     }
@@ -54,6 +55,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         else if (findByDisplayName(user.displayName) != null) {
             throw UserDisplayNameConflict("user/display-name-conflict")
         } else {
+            messageSender.sendUser(GameUserDto(user.userId));
             log.info("user " + user.email + " has been registered!")
             save(user)
         }
@@ -76,6 +78,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
             val cookie = Cookie("jwt", jwt)
             cookie.isHttpOnly = true
             response.addCookie(cookie)
+            messageSender.sendUser(AnalyticsUserDto(user.userId, LocalDateTime.parse(user.lastLogin, DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
             log.info("user " + user.email + " succesfully logged in!")
             return user
         }

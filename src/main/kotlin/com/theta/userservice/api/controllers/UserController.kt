@@ -1,6 +1,7 @@
-package com.theta.userservice.api
+package com.theta.userservice.api.controllers
 
 import Sl4jLogger.Companion.log
+import com.theta.userservice.api.controllers.messaging.MessageSender
 import com.theta.userservice.domain.model.User
 import com.theta.userservice.dto.*
 import com.theta.userservice.service.*
