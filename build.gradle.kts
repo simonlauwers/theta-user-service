@@ -38,10 +38,11 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security:2.6.1")
 	implementation("com.google.code.gson:gson:2.8.9")
 	implementation("org.springframework.boot:spring-boot-starter-mail:2.5.6")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.6.1")
 
 	// messaging
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-	implementation("org.springframework.boot:spring-boot-starter-amqp:2.5.5")
+	implementation("org.springframework.boot:spring-boot-starter-amqp:2.6.1")
 	testImplementation("org.springframework.amqp:spring-rabbit-test:2.3.9")
 
 
