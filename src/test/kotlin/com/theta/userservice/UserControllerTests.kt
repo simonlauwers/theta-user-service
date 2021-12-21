@@ -3,13 +3,15 @@ package com.theta.userservice
 //import org.hamcrest.Matchers.notNullValue
 
 import com.google.gson.Gson
-import com.theta.userservice.dto.EmailDto
-import com.theta.userservice.dto.LoginDto
-import com.theta.userservice.dto.RegisterDto
-import com.theta.userservice.dto.TokenDto
+import com.theta.userservice.controller.dto.EmailDto
+import com.theta.userservice.controller.dto.LoginDto
+import com.theta.userservice.controller.dto.RegisterDto
+import com.theta.userservice.controller.dto.TokenDto
 import com.theta.userservice.domain.model.ConfirmationToken
 import com.theta.userservice.domain.model.User
-import com.theta.userservice.service.*
+import com.theta.userservice.domain.service.ConfirmationTokenService
+import com.theta.userservice.domain.service.RoleService
+import com.theta.userservice.domain.service.UserService
 import io.restassured.RestAssured
 import io.restassured.builder.RequestSpecBuilder
 import io.restassured.config.LogConfig
@@ -45,7 +47,7 @@ class UserControllerTests @Autowired constructor(val userService: UserService, v
         val config = RestAssuredConfig.config().logConfig(logConfig)
         requestSpecification = RequestSpecBuilder().setBaseUri("http://localhost:8081").setContentType(ContentType.JSON).setRelaxedHTTPSValidation().setConfig(config).build()
         // test data
-        val simon = userService.save(User("simon.lauwers4@gmail.com", "Clubvantstad01", "RadjaFanAccount", false, true, roleService.findByName("user")!!))
+        val simon = userService.save(User("simon.lauwers4@gmail.com", "Clubvantstad01", "RadjaFanAccount", false, true, roleService.findByName("user")!!, ""))
         val confirmationToken = ConfirmationToken(simon)
         confirmationTokenService.addConfirmationToken(confirmationToken)
 

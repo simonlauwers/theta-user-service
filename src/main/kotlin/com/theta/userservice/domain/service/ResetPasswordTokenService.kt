@@ -1,10 +1,10 @@
-package com.theta.userservice.service
+package com.theta.userservice.domain.service
 
 import Sl4jLogger.Companion.log
 import com.theta.userservice.domain.exceptions.PasswordMismatchException
 import com.theta.userservice.domain.model.ResetPasswordToken
 import com.theta.userservice.domain.model.User
-import com.theta.userservice.dto.ResetPasswordDto
+import com.theta.userservice.controller.dto.ResetPasswordDto
 import com.theta.userservice.repository.ResetPasswordTokenRepository
 import lombok.extern.slf4j.Slf4j
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder

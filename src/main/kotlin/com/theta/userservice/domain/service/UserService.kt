@@ -1,9 +1,10 @@
-package com.theta.userservice.service
+package com.theta.userservice.domain.service
 
 import Sl4jLogger.Companion.log
+import com.theta.userservice.controller.dto.*
+import com.theta.userservice.controller.messaging.MessageSender
 import com.theta.userservice.domain.exceptions.*
 import com.theta.userservice.domain.model.User
-import com.theta.userservice.dto.*
 import com.theta.userservice.repository.UserRepository
 import lombok.extern.slf4j.Slf4j
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -17,7 +18,7 @@ import javax.servlet.http.HttpServletResponse
 
 @Service
 @Slf4j
-class UserService(val userRepository: UserRepository, val roleService: RoleService, val jwtService: JwtService) {
+class UserService(val userRepository: UserRepository, val roleService: RoleService, val jwtService: JwtService, val messageSender: MessageSender) {
     fun save(user: User): User {
         return findByEmail(user.email) ?: userRepository.save(user)
     }
@@ -76,7 +77,8 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
             val cookie = Cookie("jwt", jwt)
             cookie.isHttpOnly = true
             response.addCookie(cookie)
-            log.info("user " + user.email + " succesfully logged in!")
+            messageSender.sendUser(AnalyticsUserDto(user.userId, LocalDateTime.parse(user.lastLogin, DateTimeFormatter.ISO_LOCAL_DATE_TIME )))
+            log.info("user " + user.email + " successfully logged in!")
             return user
         }
     }
