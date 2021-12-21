@@ -91,6 +91,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
     }
 
     fun whoAmI(jwt: String?) : User{
+        log.info(jwt);
         if (jwt == null) {
             throw UnauthorizedException("user/unauthorized")
         }
