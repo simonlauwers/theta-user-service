@@ -16,7 +16,6 @@ import javax.validation.Valid
 
 
 @RestController
-@CrossOrigin("http://localhost:3000")
 class UserController(val userService: UserService, val emailService: EmailService, val confirmationTokenService: ConfirmationTokenService, val resetPasswordTokenService: ResetPasswordTokenService) {
     @PostMapping("/register")
     fun register(@RequestBody registerDto: RegisterDto): ResponseEntity<ResponseMessageDto> {
