@@ -1,10 +1,10 @@
-package com.theta.userservice.api.error
+package com.theta.userservice.controller.error
 
 
 import Sl4jLogger.Companion.log
-import com.theta.userservice.api.converters.ResponseMessageDtoConverter
+import com.theta.userservice.controller.converters.ResponseMessageDtoConverter
 import com.theta.userservice.domain.exceptions.*
-import com.theta.userservice.dto.ResponseMessageDto
+import com.theta.userservice.controller.dto.ResponseMessageDto
 import lombok.extern.slf4j.Slf4j
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

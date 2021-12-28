@@ -1,6 +1,6 @@
-package com.theta.userservice.api.converters
+package com.theta.userservice.controller.converters
 
-import com.theta.userservice.dto.ResponseMessageDto
+import com.theta.userservice.controller.dto.ResponseMessageDto
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

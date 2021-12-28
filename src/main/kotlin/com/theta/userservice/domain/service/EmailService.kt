@@ -1,10 +1,10 @@
-package com.theta.userservice.service
+package com.theta.userservice.domain.service
 
 import Sl4jLogger.Companion.log
 import com.theta.userservice.domain.model.ConfirmationToken
 import com.theta.userservice.domain.model.ResetPasswordToken
-import com.theta.userservice.dto.EmailDto
-import com.theta.userservice.dto.ResponseMessageDto
+import com.theta.userservice.controller.dto.EmailDto
+import com.theta.userservice.controller.dto.ResponseMessageDto
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper

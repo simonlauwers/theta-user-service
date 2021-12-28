@@ -1,4 +1,4 @@
-package com.theta.userservice.config
+package com.theta.userservice.controller.config
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry

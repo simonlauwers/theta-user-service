@@ -1,4 +1,4 @@
-package com.theta.userservice.service
+package com.theta.userservice.domain.service
 
 import com.theta.userservice.domain.model.Role
 import com.theta.userservice.repository.RoleRepository

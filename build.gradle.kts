@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.theta"
-version = "0.11.0"
+version = "0.12.0"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {
@@ -38,6 +38,14 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security:2.6.1")
 	implementation("com.google.code.gson:gson:2.8.9")
 	implementation("org.springframework.boot:spring-boot-starter-mail:2.5.6")
+	implementation("org.apache.commons:commons-lang3:3.12.0")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.6.1")
+
+	// messaging
+	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+	implementation("org.springframework.boot:spring-boot-starter-amqp:2.6.1")
+	testImplementation("org.springframework.amqp:spring-rabbit-test:2.3.9")
+
 
 	// testing
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:1.6.0")
