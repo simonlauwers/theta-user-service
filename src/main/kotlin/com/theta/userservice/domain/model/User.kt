@@ -47,8 +47,6 @@ class User {
     @Column
     var provider: Provider = Provider.LOCAL
 
-
-
     @OneToOne(targetEntity = Role::class, fetch = FetchType.EAGER, cascade = [CascadeType.REMOVE])
     @JoinColumn(nullable = false, name = "role_id", columnDefinition = "VARCHAR(36)")
     var role: Role? = null
