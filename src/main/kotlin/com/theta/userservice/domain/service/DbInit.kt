@@ -32,9 +32,5 @@ class DbInit(val roleService: RoleService, val userService: UserService) {
             userService.save(User(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa6"), "daniel.savin@student.kdg.be", BCryptPasswordEncoder().encode("admin"), "danielsav",
                     isEnabled = true, isBanned = false, roleService.findByName("admin")!!, "", Provider.LOCAL))
         }
-        if(userService.findByEmail("simon.lauwers@telenet.be") == null){
-            userService.save(User("simon.lauwers@telenet.be", BCryptPasswordEncoder().encode("admin"), "Simon Lauwers",
-                    isEnabled = true, isBanned = false, roleService.findByName("admin")!!, "https://mir-s3-cdn-cf.behance.net/user/276/88bd3446525599.57e4284f2899b.jpg"))
-        }
     }
 }
