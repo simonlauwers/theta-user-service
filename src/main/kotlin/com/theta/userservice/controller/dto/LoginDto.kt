@@ -1,4 +1,4 @@
-package com.theta.userservice.dto
+package com.theta.userservice.controller.dto
 
 class LoginDto(
     val email: String,

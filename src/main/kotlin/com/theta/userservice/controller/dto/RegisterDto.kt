@@ -1,4 +1,4 @@
-package com.theta.userservice.dto
+package com.theta.userservice.controller.dto
 
 import com.theta.userservice.domain.model.Provider
 

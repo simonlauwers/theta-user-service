@@ -1,4 +1,4 @@
-package com.theta.userservice.config
+package com.theta.userservice.controller.config
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

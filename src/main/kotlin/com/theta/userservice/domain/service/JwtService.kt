@@ -1,4 +1,4 @@
-package com.theta.userservice.service
+package com.theta.userservice.domain.service
 
 import com.theta.userservice.domain.exceptions.JwtEmailMismatchException
 import com.theta.userservice.domain.exceptions.UnauthorizedException

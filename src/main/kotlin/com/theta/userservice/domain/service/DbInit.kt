@@ -1,10 +1,10 @@
-package com.theta.userservice.database
+package com.theta.userservice.domain.service
 
 import com.theta.userservice.domain.model.Provider
 import com.theta.userservice.domain.model.Role
 import com.theta.userservice.domain.model.User
-import com.theta.userservice.service.RoleService
-import com.theta.userservice.service.UserService
+import com.theta.userservice.domain.service.RoleService
+import com.theta.userservice.domain.service.UserService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
 import java.util.*
@@ -31,6 +31,10 @@ class DbInit(val roleService: RoleService, val userService: UserService) {
                     isEnabled = true, isBanned = false, roleService.findByName("admin")!!, "", Provider.LOCAL))
             userService.save(User(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa6"), "daniel.savin@student.kdg.be", BCryptPasswordEncoder().encode("admin"), "danielsav",
                     isEnabled = true, isBanned = false, roleService.findByName("admin")!!, "", Provider.LOCAL))
+        }
+        if(userService.findByEmail("simon.lauwers@telenet.be") == null){
+            userService.save(User("simon.lauwers@telenet.be", BCryptPasswordEncoder().encode("admin"), "Simon Lauwers",
+                    isEnabled = true, isBanned = false, roleService.findByName("admin")!!, "https://mir-s3-cdn-cf.behance.net/user/276/88bd3446525599.57e4284f2899b.jpg"))
         }
     }
 }

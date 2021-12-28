@@ -1,9 +1,12 @@
-package com.theta.userservice.api
+package com.theta.userservice.controller.api
 
 import Sl4jLogger.Companion.log
+import com.theta.userservice.controller.dto.*
 import com.theta.userservice.domain.model.User
-import com.theta.userservice.dto.*
-import com.theta.userservice.service.*
+import com.theta.userservice.domain.service.ConfirmationTokenService
+import com.theta.userservice.domain.service.EmailService
+import com.theta.userservice.domain.service.ResetPasswordTokenService
+import com.theta.userservice.domain.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -16,7 +19,7 @@ import javax.validation.Valid
 
 @RestController
 @CrossOrigin("http://localhost:3000")
-class UserController(val userService: UserService, val emailService: EmailService, val confirmationTokenService: ConfirmationTokenService, val resetPasswordTokenService: ResetPasswordTokenService) {
+class UserRestController(val userService: UserService, val emailService: EmailService, val confirmationTokenService: ConfirmationTokenService, val resetPasswordTokenService: ResetPasswordTokenService) {
     @PostMapping("/register")
     fun register(@RequestBody registerDto: RegisterDto): ResponseEntity<ResponseMessageDto> {
         val user = userService.registerUser(registerDto)
