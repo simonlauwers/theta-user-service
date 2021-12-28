@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletResponse
 @Slf4j
 class UserService(val userRepository: UserRepository, val roleService: RoleService, val jwtService: JwtService, val messageSender: MessageSender) {
     fun save(user: User): User {
-        log.info("user found: " + (findByEmail(user.email)?.userId ?: ""))
         return findByEmail(user.email) ?: userRepository.save(user)
     }
 
@@ -84,7 +83,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         if (user.isBanned) {
             throw UserIsBannedException("user/banned")
         }
-        return if (!BCryptPasswordEncoder().matches(loginDto.password, user.password) && user.provider == Provider.LOCAL)
+        if (!BCryptPasswordEncoder().matches(loginDto.password, user.password) && user.provider == Provider.LOCAL)
             throw InvalidPasswordException("user/invalid-password")
         else {
             user.lastLogin = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
@@ -92,7 +91,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
             val jwt = jwtService.create(user)
             val cookie = Cookie("jwt", jwt)
             cookie.isHttpOnly = true
-            cookie.domain = "theta-risk.com"
+            //cookie.domain = "theta-risk.com"
             response.addCookie(cookie)
             messageSender.sendUser(AnalyticsUserDto(user.userId, LocalDateTime.parse(user.lastLogin, DateTimeFormatter.ISO_LOCAL_DATE_TIME )))
             log.info("user " + user.email + " successfully logged in!")

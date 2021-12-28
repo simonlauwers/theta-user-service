@@ -13,7 +13,7 @@ class WebConfig(val authFilter: AuthFilter) : WebMvcConfigurer {
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(authFilter)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/register", "/login", "/confirm-account", "/send-forgot-password-email", "/send-confirmation-email")
+                .excludePathPatterns("/register", "/login", "/confirm-account", "/send-forgot-password-email", "/send-confirmation-email", "/google-login" )
     }
 
 }
