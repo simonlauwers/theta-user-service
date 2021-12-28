@@ -38,6 +38,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security:2.6.1")
 	implementation("com.google.code.gson:gson:2.8.9")
 	implementation("org.springframework.boot:spring-boot-starter-mail:2.5.6")
+	implementation("org.apache.commons:commons-lang3:3.12.0")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.6.1")
 
 	// messaging
