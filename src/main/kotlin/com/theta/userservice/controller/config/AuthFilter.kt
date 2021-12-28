@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service
 @Service
 @Slf4j
 class AuthFilter(val jwtService: JwtService) : HandlerInterceptor {
-
-
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         try {
             if (request.cookies == null || request.cookies.isEmpty()) throw UnauthorizedException("user/unauthorized")

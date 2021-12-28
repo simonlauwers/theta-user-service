@@ -19,7 +19,7 @@ class CorsFilter{
                 val allowedOrigins = corsOriginPatterns.split(",").toTypedArray()
                 registry.addMapping("/**")
                         .allowedMethods("*")
-                        .allowedOriginPatterns(*allowedOrigins)
+                        .allowedOriginPatterns("http://localhost:3000")
                         .allowCredentials(true)
             }
         }
