@@ -31,7 +31,7 @@ class UserRestController(val userService: UserService, val emailService: EmailSe
         return ResponseEntity(confirmationTokenService.confirmAccount(tokenDTO), HttpStatus.ACCEPTED)
     }
 
-    @CrossOrigin
+    //@CrossOrigin
     @PostMapping("/login")
     fun login(@RequestBody loginDto: LoginDto, response: HttpServletResponse): ResponseEntity<User> {
         return ResponseEntity(userService.login(loginDto, response), HttpStatus.ACCEPTED)
