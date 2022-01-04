@@ -1,4 +1,4 @@
-package com.theta.userservice.dto
+package com.theta.userservice.controller.dto
 
 class EditProfileDto {
     val email = ""

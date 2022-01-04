@@ -1,13 +1,15 @@
-package com.theta.userservice.api
+package com.theta.userservice.controller.api
 
 import Sl4jLogger.Companion.log
+import com.theta.userservice.controller.dto.*
 import com.theta.userservice.domain.model.User
-import com.theta.userservice.dto.*
-import com.theta.userservice.service.*
+import com.theta.userservice.domain.service.ConfirmationTokenService
+import com.theta.userservice.domain.service.EmailService
+import com.theta.userservice.domain.service.ResetPasswordTokenService
+import com.theta.userservice.domain.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.servlet.http.Cookie
@@ -17,10 +19,10 @@ import javax.validation.Valid
 
 @RestController
 @CrossOrigin("http://localhost:3000")
-class UserController(val userService: UserService, val emailService: EmailService, val confirmationTokenService: ConfirmationTokenService, val resetPasswordTokenService: ResetPasswordTokenService) {
+class UserRestController(val userService: UserService, val emailService: EmailService, val confirmationTokenService: ConfirmationTokenService, val resetPasswordTokenService: ResetPasswordTokenService) {
     @PostMapping("/register")
     fun register(@RequestBody registerDto: RegisterDto): ResponseEntity<ResponseMessageDto> {
-        val user = userService.registerUser(registerDto);
+        val user = userService.registerUser(registerDto)
         return ResponseEntity(emailService.sendConfirmationEmail(EmailDto(user.email)), HttpStatus.CREATED)
     }
 
@@ -55,6 +57,16 @@ class UserController(val userService: UserService, val emailService: EmailServic
         return ResponseEntity(resetPasswordTokenService.resetPassword(passwordDto), HttpStatus.ACCEPTED)
     }
 
+    @PostMapping("/google-login")
+    fun providerLogin(@RequestBody user: GoogleProfileDto, response: HttpServletResponse) : ResponseEntity<User>{
+        return ResponseEntity(userService.googleLogin(user, response), HttpStatus.ACCEPTED)
+    }
+
+    @PostMapping("/displayname-available")
+    fun displayNameAvalailble(@RequestBody displaynameDto: DisplaynameDto) : ResponseEntity<Boolean>{
+        return ResponseEntity(userService.displayNameAvailale(displaynameDto), HttpStatus.ACCEPTED)
+    }
+
     /**
      * To delete the previous jwt cookie we need to create a cookie with the same name
      * and set the value to an emtpy string and the maxAge to 0.
@@ -65,7 +77,7 @@ class UserController(val userService: UserService, val emailService: EmailServic
         cookie.isHttpOnly = true
         cookie.maxAge = 0
         response.addCookie(cookie)
-        log.info("user with jwt $jwt logged out!");
+        log.info("user with jwt ${jwt.value} logged out!")
         return ResponseEntity(
                 ResponseMessageDto.Builder()
                         .message("user/logged-out")

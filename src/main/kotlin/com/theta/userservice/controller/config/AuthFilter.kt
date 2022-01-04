@@ -1,9 +1,9 @@
-package com.theta.userservice.config
+package com.theta.userservice.controller.config
 
 
 import Sl4jLogger.Companion.log
 import com.theta.userservice.domain.exceptions.UnauthorizedException
-import com.theta.userservice.service.JwtService
+import com.theta.userservice.domain.service.JwtService
 import io.jsonwebtoken.JwtException
 import lombok.extern.slf4j.Slf4j
 import org.slf4j.LoggerFactory
