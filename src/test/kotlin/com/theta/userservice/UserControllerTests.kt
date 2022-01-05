@@ -8,6 +8,7 @@ import com.theta.userservice.controller.dto.LoginDto
 import com.theta.userservice.controller.dto.RegisterDto
 import com.theta.userservice.controller.dto.TokenDto
 import com.theta.userservice.domain.model.ConfirmationToken
+import com.theta.userservice.domain.model.Provider
 import com.theta.userservice.domain.model.User
 import com.theta.userservice.domain.service.ConfirmationTokenService
 import com.theta.userservice.domain.service.RoleService
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.annotation.DirtiesContext
+import java.util.*
 import javax.transaction.Transactional
 
 
@@ -47,7 +49,7 @@ class UserControllerTests @Autowired constructor(val userService: UserService, v
         val config = RestAssuredConfig.config().logConfig(logConfig)
         requestSpecification = RequestSpecBuilder().setBaseUri("http://localhost:8081").setContentType(ContentType.JSON).setRelaxedHTTPSValidation().setConfig(config).build()
         // test data
-        val simon = userService.save(User("simon.lauwers4@gmail.com", "Clubvantstad01", "RadjaFanAccount", false, true, roleService.findByName("user")!!, ""))
+        val simon = userService.save(User("simon.lauwers4@gmail.com", "Clubvantstad01", "RadjaFanAccount", false, true, Provider.LOCAL))
         val confirmationToken = ConfirmationToken(simon)
         confirmationTokenService.addConfirmationToken(confirmationToken)
 
@@ -64,7 +66,7 @@ class UserControllerTests @Autowired constructor(val userService: UserService, v
     @Transactional
     @DirtiesContext
     fun `register a single user`() {
-        val reqBody = gson.toJson(RegisterDto("simonlauw", "simon.lauwers@telenet.be", "Badeendjes1972"))
+        val reqBody = gson.toJson(RegisterDto("simonlauw", "simon.lauwers@telenet.be", "Badeendjes1972", "", Provider.LOCAL))
         Given {
             spec(requestSpecification).body(reqBody)
         } When {

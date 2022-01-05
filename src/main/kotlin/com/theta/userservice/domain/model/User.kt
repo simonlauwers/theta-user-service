@@ -15,7 +15,6 @@ import javax.validation.constraints.Email
 @AllArgsConstructor
 class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Type(type="uuid-char")
     @Column(name = "ID", columnDefinition = "VARCHAR(36)")
     var userId: UUID = UUID.randomUUID()
@@ -46,8 +45,6 @@ class User {
 
     @Column
     var provider: Provider = Provider.LOCAL
-
-
 
     @OneToOne(targetEntity = Role::class, fetch = FetchType.EAGER, cascade = [CascadeType.REMOVE])
     @JoinColumn(nullable = false, name = "role_id", columnDefinition = "VARCHAR(36)")
