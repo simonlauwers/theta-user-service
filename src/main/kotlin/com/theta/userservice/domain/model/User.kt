@@ -15,7 +15,6 @@ import javax.validation.constraints.Email
 @AllArgsConstructor
 class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Type(type="uuid-char")
     @Column(name = "ID", columnDefinition = "VARCHAR(36)")
     var userId: UUID = UUID.randomUUID()
