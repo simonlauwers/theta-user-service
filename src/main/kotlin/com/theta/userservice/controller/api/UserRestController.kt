@@ -18,7 +18,6 @@ import javax.validation.Valid
 
 
 @RestController
-@CrossOrigin("http://localhost:3000")
 class UserRestController(val userService: UserService, val emailService: EmailService, val confirmationTokenService: ConfirmationTokenService, val resetPasswordTokenService: ResetPasswordTokenService) {
     @PostMapping("/register")
     fun register(@RequestBody registerDto: RegisterDto): ResponseEntity<ResponseMessageDto> {
@@ -32,6 +31,7 @@ class UserRestController(val userService: UserService, val emailService: EmailSe
     }
 
     //@CrossOrigin
+
     @PostMapping("/login")
     fun login(@RequestBody loginDto: LoginDto, response: HttpServletResponse): ResponseEntity<User> {
         return ResponseEntity(userService.login(loginDto, response), HttpStatus.ACCEPTED)
