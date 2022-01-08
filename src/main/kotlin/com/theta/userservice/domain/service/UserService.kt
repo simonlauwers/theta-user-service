@@ -96,11 +96,11 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
             val jwt = jwtService.create(user)
             val cookie = Cookie("jwt", jwt)
             cookie.isHttpOnly = true
-            if(domain == "theta-risk.com"){
+            if (domain == "theta-risk.com") {
                 cookie.domain = domain
             }
             response.addCookie(cookie)
-            messageSender.sendUser(AnalyticsUserDto(user.userId, LocalDateTime.parse(user.lastLogin, DateTimeFormatter.ISO_LOCAL_DATE_TIME )))
+            messageSender.sendUser(AnalyticsUserDto(user.userId, LocalDateTime.parse(user.lastLogin, DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
             log.info("user " + user.email + " successfully logged in!")
             return user
         }
@@ -152,25 +152,24 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
     }
 
     fun displayNameAvailale(displayName: DisplaynameDto): Boolean {
-        if(findByDisplayName(displayName.displayName) == null) return true else throw UserDisplayNameConflict("user/display-name-conflict")
+        if (findByDisplayName(displayName.displayName) == null) return true else throw UserDisplayNameConflict("user/display-name-conflict")
     }
 
-    fun banUser(jwt: String?, userId: String) : User{
-        val admin = whoAmI(jwt);
-        if(admin.role?.name !== "admin"){
+    fun banUser(admin: User, userId: String): User {
+        if (admin.role?.name?.lowercase(Locale.getDefault()) != "admin") {
             throw UnauthorizedException("user/unauthorized");
         }
-        val user = findById(UUID.fromString(jwt))
-        if(!user.isPresent){
-           throw EntityNotFoundException("user/not-found");
+        val user = findById(UUID.fromString(userId))
+        if (!user.isPresent) {
+            throw EntityNotFoundException("user/not-found");
         }
         user.get().isBanned = true
         return update(user.get());
     }
 
-    fun getAllUsers() : List<User> {
+    fun getAllUsers(): List<User> {
         val users: ArrayList<User> = ArrayList();
-        for (user in userRepository.findAll()){
+        for (user in userRepository.findAll()) {
             users.add(user);
         }
         return users;

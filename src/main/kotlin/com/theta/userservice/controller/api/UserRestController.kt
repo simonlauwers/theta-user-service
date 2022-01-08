@@ -69,8 +69,8 @@ class UserRestController(val userService: UserService, val emailService: EmailSe
     }
 
     @PostMapping("/ban")
-    fun banUser(@CookieValue jwt: Cookie, @RequestParam userId: String) : ResponseEntity<User> {
-        return ResponseEntity(userService.banUser(jwt.toString(), userId), HttpStatus.ACCEPTED)
+    fun banUser(@CookieValue jwt: String, @RequestParam userId: String) : ResponseEntity<User> {
+        return ResponseEntity(userService.banUser(userService.whoAmI(jwt), userId), HttpStatus.ACCEPTED)
     }
 
     @GetMapping("/getAllUsers")
