@@ -17,6 +17,7 @@ import java.util.*
 import javax.persistence.EntityNotFoundException
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
+import kotlin.collections.ArrayList
 
 @Service
 @Slf4j
@@ -148,5 +149,27 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
     fun displayNameAvailale(displayName: DisplaynameDto): Boolean {
         if(findByDisplayName(displayName.displayName) == null) return true else throw UserDisplayNameConflict("user/display-name-conflict")
     }
+
+    fun banUser(jwt: String?, userId: String) : User{
+        val admin = whoAmI(jwt);
+        if(admin.role?.name !== "admin"){
+            throw UnauthorizedException("user/unauthorized");
+        }
+        val user = findById(UUID.fromString(jwt))
+        if(!user.isPresent){
+           throw EntityNotFoundException("user/not-found");
+        }
+        user.get().isBanned = true
+        return update(user.get());
+    }
+
+    fun getAllUsers() : List<User> {
+        val users: ArrayList<User> = ArrayList();
+        for (user in userRepository.findAll()){
+            users.add(user);
+        }
+        return users;
+    }
+
 
 }

@@ -6,5 +6,5 @@ import java.util.*
 
 interface UserRepository : CrudRepository<User, UUID> {
     fun findByEmail(email: String) : User?
-    fun findByDisplayName(name: String) : User?
+    fun findByDisplayName(name: String) : User
 }
