@@ -8,21 +8,12 @@ variables:
   CONTAINER_NAME: eu.gcr.io/ip2-test/user-service
 
 stages:
-  - test
   - build
   - package
   - push
   - tag-release
   - deploy-staging
   - deploy-production
-
-test:
-  stage: test
-  image: gradle:alpine
-  except:
-    - tags
-  script:
-    - echo todo
 
 gradle-build:
   image: gradle:alpine
