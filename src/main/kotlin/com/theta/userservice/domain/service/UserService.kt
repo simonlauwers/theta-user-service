@@ -9,6 +9,7 @@ import com.theta.userservice.domain.model.User
 import com.theta.userservice.repository.UserRepository
 import lombok.extern.slf4j.Slf4j
 import org.apache.commons.lang3.RandomStringUtils
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -22,8 +23,10 @@ import kotlin.collections.ArrayList
 @Service
 @Slf4j
 class UserService(val userRepository: UserRepository, val roleService: RoleService, val jwtService: JwtService, val messageSender: MessageSender) {
+    @Value("\${cookie.domain}")
+    private val domain: String = ""
+
     fun save(user: User): User {
-        log.info("user found: " + (findByEmail(user.email)?.userId ?: ""))
         return findByEmail(user.email) ?: userRepository.save(user)
     }
 
@@ -85,7 +88,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         if (user.isBanned) {
             throw UserIsBannedException("user/banned")
         }
-        return if (!BCryptPasswordEncoder().matches(loginDto.password, user.password) && user.provider == Provider.LOCAL)
+        if (!BCryptPasswordEncoder().matches(loginDto.password, user.password) && user.provider == Provider.LOCAL)
             throw InvalidPasswordException("user/invalid-password")
         else {
             user.lastLogin = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
@@ -93,7 +96,9 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
             val jwt = jwtService.create(user)
             val cookie = Cookie("jwt", jwt)
             cookie.isHttpOnly = true
-            cookie.domain = "theta-risk.com"
+            if(domain == "theta-risk.com"){
+                cookie.domain = domain
+            }
             response.addCookie(cookie)
             messageSender.sendUser(AnalyticsUserDto(user.userId, LocalDateTime.parse(user.lastLogin, DateTimeFormatter.ISO_LOCAL_DATE_TIME )))
             log.info("user " + user.email + " successfully logged in!")
@@ -105,7 +110,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         checkJwtWithUser(jwt, editProfileDto.displayName, editProfileDto.email)
         val user = findByEmail(editProfileDto.email) ?: throw EntityNotFoundException("user/not-found")
         user.displayName = editProfileDto.displayName
-        user.profilePicture = editProfileDto.profilePicture
+        //user.profilePicture = editProfileDto.profilePicture
         log.info("userprofile " + user.email + " was edited!")
         return userRepository.save(user)
     }
