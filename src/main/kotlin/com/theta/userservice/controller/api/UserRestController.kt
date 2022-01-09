@@ -7,6 +7,7 @@ import com.theta.userservice.domain.service.ConfirmationTokenService
 import com.theta.userservice.domain.service.EmailService
 import com.theta.userservice.domain.service.ResetPasswordTokenService
 import com.theta.userservice.domain.service.UserService
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -40,7 +41,10 @@ class UserRestController(val userService: UserService, val emailService: EmailSe
 
     @GetMapping("/whoami")
     fun test(@CookieValue("jwt") jwt: String?): ResponseEntity<User> {
-        return ResponseEntity(userService.whoAmI(jwt), HttpStatus.ACCEPTED)
+        val user = userService.whoAmI(jwt)
+        val responseHeaders = HttpHeaders()
+        responseHeaders.set("x-authentication-id", user.userId.toString())
+        return ResponseEntity(user, responseHeaders, HttpStatus.ACCEPTED)
     }
 
     @PostMapping("/edit-profile")
