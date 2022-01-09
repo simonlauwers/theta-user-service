@@ -54,7 +54,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         val user = User()
         if (registerDto.provider != Provider.LOCAL) {
             val characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$%^&*()-_=+[{]}\\|;:\'\",<.>/?"
-            user.password = RandomStringUtils.random(10, characters)
+            user.password = BCryptPasswordEncoder().encode(RandomStringUtils.random(10, characters))
         } else {
             user.password = BCryptPasswordEncoder().encode(registerDto.password)
         }
@@ -87,7 +87,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         if (user.isBanned) {
             throw UserIsBannedException("user/banned")
         }
-        if (!BCryptPasswordEncoder().matches(loginDto.password, user.password) && user.provider == Provider.LOCAL)
+        if (!BCryptPasswordEncoder().matches(loginDto.password, user.password) && user.provider ==Provider.LOCAL)
             throw InvalidPasswordException("user/invalid-password")
         else {
             user.lastLogin = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
@@ -146,9 +146,9 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
     fun googleLogin(user: GoogleProfileDto, response: HttpServletResponse): User {
         var exUser = findByEmail(user.email)
         if (exUser == null) {
-            exUser = registerUser(RegisterDto(user.googleId, user.email, "", user.imageUrl, Provider.GOOGLE))
+            exUser = registerUser(RegisterDto(user.givenName + user.googleId, user.email, "", user.imageUrl, Provider.GOOGLE))
+            messageSender.sendUser(GameUserDto(exUser.userId))
         }
-        messageSender.sendUser(GameUserDto(exUser.userId))
         return login(LoginDto(exUser.email, exUser.password), response)
     }
 
