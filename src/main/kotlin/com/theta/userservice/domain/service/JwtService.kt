@@ -18,7 +18,7 @@ import kotlin.math.exp
 class JwtService() {
 
     @Value("\${jwt.expiration}")
-    val expiration: Int = 604800 // 1 week
+    val expiration: Int = 604800000 // 1 week
 
     @Value("\${jwt.secret}")
     private val secret: String = ""
