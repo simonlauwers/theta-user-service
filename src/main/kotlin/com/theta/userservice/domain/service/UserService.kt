@@ -98,6 +98,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
             if (domain == "theta-risk.com") {
                 cookie.domain = domain
             }
+            cookie.path = "/"
             response.addCookie(cookie)
             messageSender.sendUser(AnalyticsUserDto(user.userId, LocalDateTime.parse(user.lastLogin, DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
             log.info("user " + user.email + " successfully logged in!")
