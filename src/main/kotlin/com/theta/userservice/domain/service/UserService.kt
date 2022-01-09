@@ -9,6 +9,7 @@ import com.theta.userservice.domain.model.User
 import com.theta.userservice.repository.UserRepository
 import lombok.extern.slf4j.Slf4j
 import org.apache.commons.lang3.RandomStringUtils
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -17,12 +18,15 @@ import java.util.*
 import javax.persistence.EntityNotFoundException
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
+import kotlin.collections.ArrayList
 
 @Service
 @Slf4j
 class UserService(val userRepository: UserRepository, val roleService: RoleService, val jwtService: JwtService, val messageSender: MessageSender) {
+    @Value("\${cookie.domain}")
+    private val domain: String = ""
+
     fun save(user: User): User {
-        log.info("user found: " + (findByEmail(user.email)?.userId ?: ""))
         return findByEmail(user.email) ?: userRepository.save(user)
     }
 
@@ -65,7 +69,6 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         } else {
             user.profilePicture = registerDto.profilePicture
         }
-
         return if (findByEmail(user.email) != null)
             throw UserEmailConflictException("user/email-conflict")
         else if (findByDisplayName(user.displayName) != null) {
@@ -84,7 +87,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         if (user.isBanned) {
             throw UserIsBannedException("user/banned")
         }
-        return if (!BCryptPasswordEncoder().matches(loginDto.password, user.password) && user.provider == Provider.LOCAL)
+        if (!BCryptPasswordEncoder().matches(loginDto.password, user.password) && user.provider == Provider.LOCAL)
             throw InvalidPasswordException("user/invalid-password")
         else {
             user.lastLogin = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
@@ -92,9 +95,11 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
             val jwt = jwtService.create(user)
             val cookie = Cookie("jwt", jwt)
             cookie.isHttpOnly = true
-            cookie.domain = "theta-risk.com"
+            if (domain == "theta-risk.com") {
+                cookie.domain = domain
+            }
             response.addCookie(cookie)
-            messageSender.sendUser(AnalyticsUserDto(user.userId, LocalDateTime.parse(user.lastLogin, DateTimeFormatter.ISO_LOCAL_DATE_TIME )))
+            messageSender.sendUser(AnalyticsUserDto(user.userId, LocalDateTime.parse(user.lastLogin, DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
             log.info("user " + user.email + " successfully logged in!")
             return user
         }
@@ -104,7 +109,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         checkJwtWithUser(jwt, editProfileDto.displayName, editProfileDto.email)
         val user = findByEmail(editProfileDto.email) ?: throw EntityNotFoundException("user/not-found")
         user.displayName = editProfileDto.displayName
-        user.profilePicture = editProfileDto.profilePicture
+        //user.profilePicture = editProfileDto.profilePicture
         log.info("userprofile " + user.email + " was edited!")
         return userRepository.save(user)
     }
@@ -146,7 +151,28 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
     }
 
     fun displayNameAvailale(displayName: DisplaynameDto): Boolean {
-        if(findByDisplayName(displayName.displayName) == null) return true else throw UserDisplayNameConflict("user/display-name-conflict")
+        if (findByDisplayName(displayName.displayName) == null) return true else throw UserDisplayNameConflict("user/display-name-conflict")
     }
+
+    fun banUser(admin: User, userId: String): User {
+        if (admin.role?.name?.lowercase(Locale.getDefault()) != "admin") {
+            throw UnauthorizedException("user/unauthorized");
+        }
+        val user = findById(UUID.fromString(userId))
+        if (!user.isPresent) {
+            throw EntityNotFoundException("user/not-found");
+        }
+        user.get().isBanned = true
+        return update(user.get());
+    }
+
+    fun getAllUsers(): List<User> {
+        val users: ArrayList<User> = ArrayList();
+        for (user in userRepository.findAll()) {
+            users.add(user);
+        }
+        return users;
+    }
+
 
 }

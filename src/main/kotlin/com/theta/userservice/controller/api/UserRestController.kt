@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
@@ -67,6 +68,16 @@ class UserRestController(val userService: UserService, val emailService: EmailSe
         return ResponseEntity(userService.displayNameAvailale(displaynameDto), HttpStatus.ACCEPTED)
     }
 
+    @PostMapping("/ban")
+    fun banUser(@CookieValue jwt: String, @RequestParam userId: String) : ResponseEntity<User> {
+        return ResponseEntity(userService.banUser(userService.whoAmI(jwt), userId), HttpStatus.ACCEPTED)
+    }
+
+    @GetMapping("/getAllUsers")
+    fun getAllUsers() : ResponseEntity<List<User>> {
+        return ResponseEntity(userService.getAllUsers(), HttpStatus.ACCEPTED);
+    }
+
     /**
      * To delete the previous jwt cookie we need to create a cookie with the same name
      * and set the value to an emtpy string and the maxAge to 0.
@@ -85,6 +96,10 @@ class UserRestController(val userService: UserService, val emailService: EmailSe
                         .timeStamp(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                         .build(), HttpStatus.ACCEPTED)
     }
+
+
+
+
 
 
 }
