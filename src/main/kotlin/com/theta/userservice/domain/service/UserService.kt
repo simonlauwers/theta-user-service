@@ -69,7 +69,6 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         } else {
             user.profilePicture = registerDto.profilePicture
         }
-
         return if (findByEmail(user.email) != null)
             throw UserEmailConflictException("user/email-conflict")
         else if (findByDisplayName(user.displayName) != null) {
