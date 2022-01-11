@@ -5,6 +5,7 @@ import com.theta.userservice.domain.exceptions.PasswordMismatchException
 import com.theta.userservice.domain.model.ResetPasswordToken
 import com.theta.userservice.domain.model.User
 import com.theta.userservice.controller.dto.ResetPasswordDto
+import com.theta.userservice.controller.dto.UserDto
 import com.theta.userservice.repository.ResetPasswordTokenRepository
 import lombok.extern.slf4j.Slf4j
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -23,7 +24,7 @@ class ResetPasswordTokenService(val resetPasswordTokenRepository: ResetPasswordT
         return resetPasswordTokenRepository.findByResetPasswordToken(token)
     }
 
-    fun resetPassword(passwordDto: ResetPasswordDto): User {
+    fun resetPassword(passwordDto: ResetPasswordDto): UserDto {
         if (passwordDto.confirmNewPassword != passwordDto.newPassword)
             throw PasswordMismatchException("user/password-mismatch")
 
@@ -33,6 +34,6 @@ class ResetPasswordTokenService(val resetPasswordTokenRepository: ResetPasswordT
         user.password = BCryptPasswordEncoder().encode(passwordDto.newPassword)
         userService.save(user)
         log.info("user " + user.email + " password has been reset!")
-        return user
+        return UserDto(user.email, user.displayName, user.isEnabled, user.isBanned, user.provider)
     }
 }
