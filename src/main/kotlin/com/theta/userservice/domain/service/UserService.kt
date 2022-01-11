@@ -150,8 +150,8 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         var exUser = findByEmail(user.email)
         if (exUser == null) {
             exUser = registerUser(RegisterDto(user.givenName + user.googleId, user.email, "", user.imageUrl, Provider.GOOGLE))
-            messageSender.sendUser(GameUserDto(exUser.userId))
         }
+        messageSender.sendUser(GameUserDto(exUser.userId))
         return login(LoginDto(exUser.email, exUser.password), response)
     }
 
