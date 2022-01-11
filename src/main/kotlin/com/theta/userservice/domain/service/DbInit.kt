@@ -26,7 +26,7 @@ class DbInit(val roleService: RoleService, val userService: UserService) {
             userService.save(User(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3"), "nathan.tetroashvili@student.kdg.be", BCryptPasswordEncoder().encode("admin"), "nathantetro",
                     isEnabled = true, isBanned = false, roleService.findByName("admin")!!, "https://avatars.dicebear.com/api/micah/${Math.random()}.svg", Provider.LOCAL))
             userService.save(User(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4"), "siemen.vandemosselaer@student.kdg.be", BCryptPasswordEncoder().encode("admin"), "siemenvdm",
-                    isEnabled = true, isBanned = false, roleService.findByName("admin")!!, "https://avatars.dicebear.com/api/micah/${Math.random()}.svg", Provider.LOCAL))
+                    isEnabled = true, isBanned = false, roleService.findByName("admin")!!,  "https://avatars.dicebear.com/api/micah/${Math.random()}.svg", Provider.LOCAL))
             userService.save(User(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5"), "youssef.taouil@student.kdg.be", BCryptPasswordEncoder().encode("admin"), "yousseftao",
                     isEnabled = true, isBanned = false, roleService.findByName("admin")!!, "https://avatars.dicebear.com/api/micah/${Math.random()}.svg", Provider.LOCAL))
             userService.save(User(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa6"), "daniel.savin@student.kdg.be", BCryptPasswordEncoder().encode("admin"), "danielsav",
