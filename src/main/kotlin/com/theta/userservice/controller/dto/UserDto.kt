@@ -29,11 +29,14 @@ class UserDto {
 
     var role: Role? = null
 
-    constructor(email:String, displayName: String, isEnabled: Boolean, isBanned: Boolean, provider: Provider) {
+    constructor(email:String, displayName: String, isEnabled: Boolean, isBanned: Boolean, provider: Provider, role: Role, profilePicture: String, lastLogin: String) {
         this.email = email
         this.displayName = displayName
         this.isEnabled = isEnabled
         this.isBanned = isBanned
         this.provider = provider
+        this.role= role
+        this.profilePicture = profilePicture
+        this.lastLogin = lastLogin
     }
 }
