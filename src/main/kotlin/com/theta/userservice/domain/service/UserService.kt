@@ -32,7 +32,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
 
     fun update(user: User): UserDto {
         val updatedUser = userRepository.save(user)
-        return UserDto(updatedUser.email, updatedUser.displayName, updatedUser.isEnabled, updatedUser.isBanned, updatedUser.provider, user.role!!, user.profilePicture, user.lastLogin)
+        return UserDto(updatedUser.userId, updatedUser.email, updatedUser.displayName, updatedUser.isEnabled, updatedUser.isBanned, updatedUser.provider, user.role!!, user.profilePicture, user.lastLogin)
     }
 
     fun findByEmail(email: String): User? {
@@ -103,7 +103,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
             response.addCookie(cookie)
             messageSender.sendUser(AnalyticsUserDto(user.userId, LocalDateTime.parse(user.lastLogin, DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
             log.info("user " + user.email + " successfully logged in!")
-            return UserDto(user.email, user.displayName, user.isEnabled, user.isBanned, user.provider, user.role!!, user.profilePicture, user.lastLogin)
+            return UserDto(user.userId, user.email, user.displayName, user.isEnabled, user.isBanned, user.provider, user.role!!, user.profilePicture, user.lastLogin)
         }
     }
 
@@ -114,7 +114,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         //user.profilePicture = editProfileDto.profilePicture
         log.info("userprofile " + user.email + " was edited!")
         val editedUser =  userRepository.save(user)
-        return UserDto(editedUser.email, editedUser.displayName, editedUser.isEnabled, editedUser.isBanned, editedUser.provider, user.role!!, user.profilePicture, user.lastLogin)
+        return UserDto(editedUser.userId, editedUser.email, editedUser.displayName, editedUser.isEnabled, editedUser.isBanned, editedUser.provider, user.role!!, user.profilePicture, user.lastLogin)
     }
 
     fun whoAmI(jwt: String?): UserDto {
@@ -125,7 +125,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         val user = findById(UUID.fromString(body.issuer))
         return if (user.isPresent) {
             val getUser = user.get();
-            UserDto(getUser.email, getUser.displayName, getUser.isEnabled, getUser.isBanned, getUser.provider, getUser.role!!, getUser.profilePicture, getUser.lastLogin)
+            UserDto(getUser.userId, getUser.email, getUser.displayName, getUser.isEnabled, getUser.isBanned, getUser.provider, getUser.role!!, getUser.profilePicture, getUser.lastLogin)
         } else {
             log.info("you are user: " + user.get().displayName)
             throw EntityNotFoundException("user/not-found")
@@ -174,7 +174,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
     fun getAllUsers(): List<UserDto> {
         val users: ArrayList<UserDto> = ArrayList();
         for (user in userRepository.findAll()) {
-            users.add(UserDto(user.email, user.displayName, user.isEnabled, user.isBanned, user.provider, user.role!!, user.profilePicture, user.lastLogin))
+            users.add(UserDto(user.userId, user.email, user.displayName, user.isEnabled, user.isBanned, user.provider, user.role!!, user.profilePicture, user.lastLogin))
         }
         return users;
     }

@@ -34,6 +34,6 @@ class ResetPasswordTokenService(val resetPasswordTokenRepository: ResetPasswordT
         user.password = BCryptPasswordEncoder().encode(passwordDto.newPassword)
         userService.save(user)
         log.info("user " + user.email + " password has been reset!")
-        return UserDto(user.email, user.displayName, user.isEnabled, user.isBanned, user.provider, user.role!!, user.profilePicture, user.lastLogin)
+        return UserDto(user.userId, user.email, user.displayName, user.isEnabled, user.isBanned, user.provider, user.role!!, user.profilePicture, user.lastLogin)
     }
 }
