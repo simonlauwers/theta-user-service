@@ -3,7 +3,7 @@
   "email": "jeroen.lauwers@telenet.be",
   "password": "$2a$10$vOWk8lK6evotluY6dxaigutLM7p3qq.G9r2HY3JaHPUF7eUrSi4ey",
   "displayName": "Simonlauwers",
-  "profilePicture": "https://commons.wikimedia.org/wiki/File:Default_pfp.jpg",
+  "profilePicture": "https://avatars.dicebear.com/api/micah/${Math.random()}.svg",
   "isEnabled": false,
   "isBanned": false,
   "lastLogin": "2021-12-05T16:36:27.7060674",
