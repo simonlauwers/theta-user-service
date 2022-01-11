@@ -11,7 +11,7 @@ import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 
 class UserDto {
-    var userId: UUID = UUID.randomUUID()
+    var userId: UUID? = null
 
     var email = ""
 
@@ -29,11 +29,15 @@ class UserDto {
 
     var role: Role? = null
 
-    constructor(email:String, displayName: String, isEnabled: Boolean, isBanned: Boolean, provider: Provider) {
+    constructor(uuid: UUID, email:String, displayName: String, isEnabled: Boolean, isBanned: Boolean, provider: Provider, role: Role, profilePicture: String, lastLogin: String) {
+        this.userId = uuid
         this.email = email
         this.displayName = displayName
         this.isEnabled = isEnabled
         this.isBanned = isBanned
         this.provider = provider
+        this.role= role
+        this.profilePicture = profilePicture
+        this.lastLogin = lastLogin
     }
 }
