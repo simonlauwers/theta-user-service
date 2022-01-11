@@ -28,19 +28,19 @@ class UserRestController(val userService: UserService, val emailService: EmailSe
     }
 
     @PostMapping("/confirm-account")
-    fun confirmAccount(@RequestBody tokenDTO: TokenDto): ResponseEntity<User> {
+    fun confirmAccount(@RequestBody tokenDTO: TokenDto): ResponseEntity<UserDto> {
         return ResponseEntity(confirmationTokenService.confirmAccount(tokenDTO), HttpStatus.ACCEPTED)
     }
 
     //@CrossOrigin
 
     @PostMapping("/login")
-    fun login(@RequestBody loginDto: LoginDto, response: HttpServletResponse): ResponseEntity<User> {
+    fun login(@RequestBody loginDto: LoginDto, response: HttpServletResponse): ResponseEntity<UserDto> {
         return ResponseEntity(userService.login(loginDto, response), HttpStatus.ACCEPTED)
     }
 
     @GetMapping("/whoami")
-    fun test(@CookieValue("jwt") jwt: String?): ResponseEntity<User> {
+    fun test(@CookieValue("jwt") jwt: String?): ResponseEntity<UserDto> {
         val user = userService.whoAmI(jwt)
         val responseHeaders = HttpHeaders()
         responseHeaders.set("x-authentication-id", user.userId.toString())
@@ -48,7 +48,7 @@ class UserRestController(val userService: UserService, val emailService: EmailSe
     }
 
     @PostMapping("/edit-profile")
-    fun editProfile(@CookieValue("jwt") jwt: String?, @Valid @RequestBody editProfileDto: EditProfileDto): ResponseEntity<User> {
+    fun editProfile(@CookieValue("jwt") jwt: String?, @Valid @RequestBody editProfileDto: EditProfileDto): ResponseEntity<UserDto> {
         return ResponseEntity(userService.editProfile(editProfileDto, jwt), HttpStatus.ACCEPTED)
     }
 
@@ -58,12 +58,12 @@ class UserRestController(val userService: UserService, val emailService: EmailSe
     }
 
     @PostMapping("/reset-password")
-    fun resetPassword(@RequestBody passwordDto: ResetPasswordDto): ResponseEntity<User> {
+    fun resetPassword(@RequestBody passwordDto: ResetPasswordDto): ResponseEntity<UserDto> {
         return ResponseEntity(resetPasswordTokenService.resetPassword(passwordDto), HttpStatus.ACCEPTED)
     }
 
     @PostMapping("/google-login")
-    fun providerLogin(@RequestBody user: GoogleProfileDto, response: HttpServletResponse) : ResponseEntity<User>{
+    fun providerLogin(@RequestBody user: GoogleProfileDto, response: HttpServletResponse) : ResponseEntity<UserDto>{
         return ResponseEntity(userService.googleLogin(user, response), HttpStatus.ACCEPTED)
     }
 
@@ -73,12 +73,12 @@ class UserRestController(val userService: UserService, val emailService: EmailSe
     }
 
     @PostMapping("/ban")
-    fun banUser(@CookieValue jwt: String, @RequestParam userId: String) : ResponseEntity<User> {
+    fun banUser(@CookieValue jwt: String, @RequestParam userId: String) : ResponseEntity<UserDto> {
         return ResponseEntity(userService.banUser(userService.whoAmI(jwt), userId), HttpStatus.ACCEPTED)
     }
 
     @GetMapping("/getAllUsers")
-    fun getAllUsers() : ResponseEntity<List<User>> {
+    fun getAllUsers() : ResponseEntity<List<UserDto>> {
         return ResponseEntity(userService.getAllUsers(), HttpStatus.ACCEPTED);
     }
 
@@ -89,7 +89,7 @@ class UserRestController(val userService: UserService, val emailService: EmailSe
     @PostMapping("/logout")
     fun logout(@CookieValue jwt: Cookie, response: HttpServletResponse) : ResponseEntity<ResponseMessageDto> {
         val cookie = Cookie("jwt", "")
-        cookie.isHttpOnly = true
+        cookie.isHttpOnly = true;
         cookie.maxAge = 0
         response.addCookie(cookie)
         log.info("user with jwt ${jwt.value} logged out!")

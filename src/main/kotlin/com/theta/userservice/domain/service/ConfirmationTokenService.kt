@@ -5,6 +5,7 @@ import com.theta.userservice.controller.dto.GameUserDto
 import com.theta.userservice.domain.model.ConfirmationToken
 import com.theta.userservice.domain.model.User
 import com.theta.userservice.controller.dto.TokenDto
+import com.theta.userservice.controller.dto.UserDto
 import com.theta.userservice.controller.messaging.MessageSender
 import com.theta.userservice.repository.ConfirmationTokenRepository
 import lombok.extern.slf4j.Slf4j
@@ -27,7 +28,7 @@ class ConfirmationTokenService(val confirmationTokenRepository: ConfirmationToke
         return confirmationTokenRepository.findByUserEntityEmail(email)
     }
 
-    fun confirmAccount(tokenDto: TokenDto): User {
+    fun confirmAccount(tokenDto: TokenDto): UserDto {
         val confirmationToken = findByConfirmationToken(tokenDto.token)
                 ?: throw EntityNotFoundException("confirmationtoken/not-found")
         val userToUpdate = userService.findById(confirmationToken.userEntity!!.userId)

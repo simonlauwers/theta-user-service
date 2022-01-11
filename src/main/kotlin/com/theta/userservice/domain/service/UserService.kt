@@ -30,8 +30,9 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         return findByEmail(user.email) ?: userRepository.save(user)
     }
 
-    fun update(user: User): User {
-        return userRepository.save(user)
+    fun update(user: User): UserDto {
+        val updatedUser = userRepository.save(user)
+        return UserDto(updatedUser.email, updatedUser.displayName, updatedUser.isEnabled, updatedUser.isBanned, updatedUser.provider)
     }
 
     fun findByEmail(email: String): User? {
@@ -75,11 +76,11 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
             throw UserDisplayNameConflict("user/display-name-conflict")
         } else {
             log.info("user " + user.email + " has been registered!")
-            save(user)
+            return save(user)
         }
     }
 
-    fun login(loginDto: LoginDto, response: HttpServletResponse): User {
+    fun login(loginDto: LoginDto, response: HttpServletResponse): UserDto {
         val user = findByEmail(loginDto.email)
                 ?: throw EntityNotFoundException("user/not-found")
         if (!user.isEnabled && user.provider == Provider.LOCAL)
@@ -102,27 +103,29 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
             response.addCookie(cookie)
             messageSender.sendUser(AnalyticsUserDto(user.userId, LocalDateTime.parse(user.lastLogin, DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
             log.info("user " + user.email + " successfully logged in!")
-            return user
+            return UserDto(user.email, user.displayName, user.isEnabled, user.isBanned, user.provider)
         }
     }
 
-    fun editProfile(editProfileDto: EditProfileDto, jwt: String?): User {
+    fun editProfile(editProfileDto: EditProfileDto, jwt: String?): UserDto {
         checkJwtWithUser(jwt, editProfileDto.displayName, editProfileDto.email)
         val user = findByEmail(editProfileDto.email) ?: throw EntityNotFoundException("user/not-found")
         user.displayName = editProfileDto.displayName
         //user.profilePicture = editProfileDto.profilePicture
         log.info("userprofile " + user.email + " was edited!")
-        return userRepository.save(user)
+        val editedUser =  userRepository.save(user)
+        return UserDto(editedUser.email, editedUser.displayName, editedUser.isEnabled, editedUser.isBanned, editedUser.provider)
     }
 
-    fun whoAmI(jwt: String?): User {
+    fun whoAmI(jwt: String?): UserDto {
         if (jwt == null) {
             throw UnauthorizedException("user/unauthorized")
         }
         val body = jwtService.getJwtClaims(jwt).body
         val user = findById(UUID.fromString(body.issuer))
         return if (user.isPresent) {
-            user.get()
+            val getUser = user.get();
+            UserDto(getUser.email, getUser.displayName, getUser.isEnabled, getUser.isBanned, getUser.provider)
         } else {
             log.info("you are user: " + user.get().displayName)
             throw EntityNotFoundException("user/not-found")
@@ -143,7 +146,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         }
     }
 
-    fun googleLogin(user: GoogleProfileDto, response: HttpServletResponse): User {
+    fun googleLogin(user: GoogleProfileDto, response: HttpServletResponse): UserDto {
         var exUser = findByEmail(user.email)
         if (exUser == null) {
             exUser = registerUser(RegisterDto(user.givenName + user.googleId, user.email, "", user.imageUrl, Provider.GOOGLE))
@@ -156,7 +159,7 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
         if (findByDisplayName(displayName.displayName) == null) return true else throw UserDisplayNameConflict("user/display-name-conflict")
     }
 
-    fun banUser(admin: User, userId: String): User {
+    fun banUser(admin: UserDto, userId: String): UserDto {
         if (admin.role?.name?.lowercase(Locale.getDefault()) != "admin") {
             throw UnauthorizedException("user/unauthorized");
         }
@@ -165,13 +168,13 @@ class UserService(val userRepository: UserRepository, val roleService: RoleServi
             throw EntityNotFoundException("user/not-found");
         }
         user.get().isBanned = true
-        return update(user.get());
+        return update(user.get())
     }
 
-    fun getAllUsers(): List<User> {
-        val users: ArrayList<User> = ArrayList();
+    fun getAllUsers(): List<UserDto> {
+        val users: ArrayList<UserDto> = ArrayList();
         for (user in userRepository.findAll()) {
-            users.add(user);
+            users.add(UserDto(user.email, user.displayName, user.isEnabled, user.isBanned, user.provider))
         }
         return users;
     }
