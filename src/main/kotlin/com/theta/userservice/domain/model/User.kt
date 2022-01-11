@@ -32,7 +32,7 @@ class User {
     var displayName = ""
 
     @Column
-    var profilePicture = "https://commons.wikimedia.org/wiki/File:Default_pfp.jpg"
+    var profilePicture = "https://avatars.dicebear.com/api/micah/${Math.random()}.svg"
 
     @Column
     var isEnabled = false
