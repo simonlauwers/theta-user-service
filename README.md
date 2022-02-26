@@ -1,7 +1,9 @@
-# USER-SERVICE
+# Thèta user-service
 This repository contains the identification of all the users in our Risk Game.
 The user-service was one of my responibilities but my teammates did contribute to this repo too.
 I decided to write this service in Kotlin because I like the null safety that Kotlin provides and the overall developer experience is great.
+Checkout our [promo video](https://www.youtube.com/watch?v=U-rB_P4w14w&t=69s&ab_channel=NathanDesign)!
+
 
 ## ⚠️ Disclaimer
 This is a micro-service of a bigger 3D Risk-game application. This project was imported from Gitlab where all our micro-service-repositories live.
